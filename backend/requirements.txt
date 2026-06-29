@@ -1,0 +1,5 @@
+django
+django-cors-headers
+pymupdf
+google-generativeai
+python-dotenv

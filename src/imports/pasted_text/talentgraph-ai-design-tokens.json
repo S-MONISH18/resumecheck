@@ -1,0 +1,303 @@
+{
+  "role": "Senior Product Designer + Senior Frontend Engineer + UX Researcher",
+  "project": {
+    "name": "TalentGraph AI",
+    "tagline": "Beyond Resume Matching. Predict Hiring Success.",
+    "description": "An AI-powered Talent Intelligence Platform that ranks candidates based on predicted hiring success instead of simple keyword matching."
+  },
+  "design_goal": {
+    "style": "Modern SaaS Enterprise Dashboard",
+    "inspiration": [
+      "Linear",
+      "Notion AI",
+      "Stripe Dashboard",
+      "Ashby ATS",
+      "Greenhouse",
+      "LinkedIn Recruiter",
+      "Vercel",
+      "OpenAI ChatGPT",
+      "GitHub",
+      "Framer"
+    ],
+    "theme": "Dark Mode",
+    "look_and_feel": [
+      "Minimal",
+      "Premium",
+      "Glassmorphism",
+      "AI-first",
+      "Enterprise",
+      "Responsive",
+      "Smooth Animations",
+      "Modern Typography"
+    ]
+  },
+  "color_palette": {
+    "background": "#020617",
+    "surface": "#0F172A",
+    "card": "#1E293B",
+    "primary": "#2563EB",
+    "secondary": "#7C3AED",
+    "success": "#10B981",
+    "warning": "#F59E0B",
+    "danger": "#EF4444",
+    "accent": "#38BDF8",
+    "text_primary": "#F8FAFC",
+    "text_secondary": "#CBD5E1",
+    "border": "#334155"
+  },
+  "typography": {
+    "font": "Inter",
+    "heading_weight": 700,
+    "body_weight": 400,
+    "button_weight": 600,
+    "spacing": "Generous whitespace with clean alignment"
+  },
+  "layout": {
+    "navigation": {
+      "type": "Collapsible Sidebar",
+      "items": [
+        "Dashboard",
+        "Candidate Search",
+        "AI Ranking",
+        "Analytics",
+        "Reports",
+        "Settings"
+      ]
+    },
+    "header": {
+      "components": [
+        "Search Bar",
+        "Notifications",
+        "Dark Mode Toggle",
+        "Profile Menu"
+      ]
+    },
+    "content": {
+      "max_width": "1440px",
+      "responsive": true,
+      "grid_system": "12-column"
+    }
+  },
+  "screens": [
+    {
+      "name": "Landing Dashboard",
+      "components": [
+        "Hero Banner",
+        "Upload Job Description Card",
+        "Drag and Drop Resume Upload",
+        "Generate Ranking Button",
+        "Quick Statistics Cards",
+        "Recent Jobs",
+        "Recent Candidate Searches"
+      ]
+    },
+    {
+      "name": "AI Processing Screen",
+      "animation": "Multi-stage animated pipeline",
+      "steps": [
+        "Understanding Job Description",
+        "Extracting Skills",
+        "Analyzing Resumes",
+        "Semantic Matching",
+        "Career Intelligence",
+        "Hiring Readiness",
+        "Profile Integrity",
+        "Generating Explainability",
+        "Ranking Candidates"
+      ],
+      "show_progress": true,
+      "estimated_time": "2-5 seconds"
+    },
+    {
+      "name": "Candidate Ranking Dashboard",
+      "components": [
+        "Top KPI Cards",
+        "Ranked Candidate Table",
+        "Search",
+        "Advanced Filters",
+        "Sort Options",
+        "Score Chips",
+        "Recommendation Badges",
+        "Pagination"
+      ]
+    },
+    {
+      "name": "Candidate Profile",
+      "layout": "Two-column",
+      "left_panel": [
+        "Profile Card",
+        "Resume Summary",
+        "Experience Timeline",
+        "Education",
+        "Certifications"
+      ],
+      "right_panel": [
+        "Overall Score Gauge",
+        "Radar Chart",
+        "Score Breakdown",
+        "Skill Heatmap",
+        "Career Growth Timeline",
+        "AI Executive Summary"
+      ]
+    },
+    {
+      "name": "Explainability",
+      "components": [
+        "Positive Signals",
+        "Negative Signals",
+        "Hiring Recommendation",
+        "Missing Skills",
+        "Reasoning Timeline",
+        "Confidence Meter"
+      ]
+    },
+    {
+      "name": "Candidate Comparison",
+      "layout": "Side-by-side",
+      "compare": [
+        "Skills",
+        "Experience",
+        "Leadership",
+        "Projects",
+        "Availability",
+        "Career Growth",
+        "Overall Score"
+      ]
+    },
+    {
+      "name": "Analytics",
+      "widgets": [
+        "Hiring Funnel",
+        "Score Distribution",
+        "Skill Gap Analysis",
+        "Top Missing Skills",
+        "Candidate Geography",
+        "Average Hiring Readiness",
+        "Profile Integrity Distribution"
+      ]
+    }
+  ],
+  "visualizations": [
+    "Radar Chart",
+    "Donut Chart",
+    "Bar Chart",
+    "Progress Bars",
+    "Timeline",
+    "Heatmap",
+    "Gauge Meter",
+    "Confidence Meter",
+    "Hiring Funnel",
+    "Trend Line"
+  ],
+  "cards": [
+    {
+      "title": "Overall AI Score",
+      "type": "Circular Gauge"
+    },
+    {
+      "title": "Semantic Match",
+      "type": "Animated Progress"
+    },
+    {
+      "title": "Career Growth",
+      "type": "Score Card"
+    },
+    {
+      "title": "Hiring Readiness",
+      "type": "Status Card"
+    },
+    {
+      "title": "Availability",
+      "type": "Badge"
+    },
+    {
+      "title": "Profile Integrity",
+      "type": "Risk Meter"
+    }
+  ],
+  "interactions": {
+    "hover": [
+      "Card Elevation",
+      "Glow Effect",
+      "Smooth Scaling"
+    ],
+    "transitions": [
+      "Fade",
+      "Slide",
+      "Spring Animation"
+    ],
+    "loading": [
+      "Skeleton UI",
+      "Animated Pipeline",
+      "Progress Ring"
+    ]
+  },
+  "ai_features": [
+    "AI Executive Summary",
+    "Candidate Recommendation",
+    "Strengths Analysis",
+    "Weakness Analysis",
+    "Missing Skills",
+    "Career Insights",
+    "Hiring Risk Prediction",
+    "Confidence Score",
+    "Natural Language Explainability"
+  ],
+  "dashboard_metrics": [
+    "Candidates Processed",
+    "Average Match Score",
+    "Highly Recommended",
+    "Ready to Interview",
+    "Skill Coverage",
+    "Hiring Readiness",
+    "Profile Integrity",
+    "Average Experience"
+  ],
+  "export_options": [
+    "PDF Report",
+    "Excel",
+    "CSV",
+    "Share Link",
+    "Recruiter Summary"
+  ],
+  "tech_stack": {
+    "frontend": [
+      "Next.js",
+      "React",
+      "TypeScript"
+    ],
+    "ui": [
+      "Tailwind CSS",
+      "shadcn/ui",
+      "Framer Motion"
+    ],
+    "charts": [
+      "Recharts"
+    ],
+    "icons": [
+      "Lucide React"
+    ]
+  },
+  "requirements": [
+    "Create a pixel-perfect enterprise SaaS interface.",
+    "Follow modern UX principles.",
+    "Use reusable components.",
+    "Support desktop, tablet, and mobile.",
+    "Include beautiful empty states.",
+    "Use premium micro-interactions.",
+    "Avoid clutter.",
+    "Prioritize recruiter productivity.",
+    "Every AI score must have an explanation.",
+    "Design should look like a startup ready for Series A funding."
+  ],
+  "output": {
+    "deliverables": [
+      "Complete UI Design",
+      "Component Library",
+      "Responsive Layout",
+      "Dashboard Screens",
+      "Dark Mode",
+      "High Fidelity Prototype"
+    ]
+  }
+}

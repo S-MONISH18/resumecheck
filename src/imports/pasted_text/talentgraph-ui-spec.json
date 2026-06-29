@@ -1,0 +1,1645 @@
+{
+  "_prompt_meta": {
+    "version": "3.0.0",
+    "title": "TalentGraph AI — Ultimate Real-World UI Specification",
+    "purpose": "Drop this JSON into Cursor, Windsurf, v0.dev, or Lovable and get a production-ready enterprise SaaS UI with zero guesswork",
+    "target_stack": "Next.js 15 App Router · TypeScript · Tailwind CSS v4 · shadcn/ui · Framer Motion · Recharts · TanStack Table v8 · Zustand · React Query v5",
+    "design_north_star": "Every screen should feel like Linear meets Notion AI — information-dense but never claustrophobic, with real breathing room between every element. The UI should feel like it was built by a team of senior engineers at a well-funded Series A startup, not a template."
+  },
+
+  "project": {
+    "name": "TalentGraph AI",
+    "tagline": "Beyond Resume Matching. Predict Hiring Success.",
+    "product_description": "TalentGraph AI is an enterprise talent intelligence platform. Recruiters paste a job description, upload up to 100 resumes, and get an AI-ranked shortlist in under 5 seconds — with an explainable score breakdown for every candidate. It replaces gut-feel screening with structured, auditable intelligence.",
+    "primary_persona": {
+      "name": "Sarah Chen",
+      "role": "Senior Talent Acquisition Lead",
+      "company": "Series B SaaS startup, ~300 employees",
+      "pain_point": "Manually screening 80+ resumes per role takes 3–4 hours. She needs to shortlist 5 candidates for a hiring manager by tomorrow morning.",
+      "device": "MacBook Pro 14\" (1512px wide viewport), Chrome",
+      "environment": "Office + remote, always dark mode"
+    }
+  },
+
+  "design_philosophy": {
+    "breathing_space": {
+      "principle": "White space is not empty space — it is the primary organizational tool. Every card, section, and element breathes. Nothing touches. Nothing crowds.",
+      "rules": [
+        "Minimum 24px between any two cards",
+        "Minimum 32px vertical padding inside every card",
+        "Minimum 48px between page sections",
+        "Minimum 16px between any label and its value",
+        "Section headers always have 8px of eyebrow text + 4px gap + heading + 8px gap before content",
+        "Tables have 20px vertical padding per row — never 12px or less",
+        "Modal content has 32px padding on all sides",
+        "Page content never touches the sidebar — always 24px gap"
+      ]
+    },
+    "visual_hierarchy": {
+      "principle": "The eye must always know where to go next. One thing is the most important on every screen.",
+      "levels": {
+        "L1_primary_action": "One per screen. Full-width or prominent CTA. Blue, always visible.",
+        "L2_primary_data": "The number or status the user came to see. Large, high-contrast.",
+        "L3_supporting_data": "Context for L2. Smaller, muted.",
+        "L4_metadata": "Timestamps, IDs, secondary labels. Text-muted, smallest size.",
+        "L5_structural": "Borders, dividers, backgrounds. Should recede completely."
+      }
+    },
+    "real_world_ux": {
+      "principle": "This is a tool used by professionals under time pressure. Every interaction must be fast, predictable, and forgiving.",
+      "rules": [
+        "No action requires more than 3 clicks from any screen",
+        "Destructive actions always have confirmation dialogs",
+        "All uploads show real progress — not spinners",
+        "All AI operations show real-time status — not just a loading screen",
+        "Search results appear within 200ms of typing (debounced 150ms)",
+        "Every table row is individually actionable without selecting it first",
+        "Back navigation always works and returns the user to exact scroll position"
+      ]
+    },
+    "copy_principles": {
+      "tone": "Confident and direct. Written for busy professionals. No fluff, no jargon, no exclamation marks.",
+      "labels": "Verb-first: 'Upload resumes' not 'Resume Upload'. 'Generate ranking' not 'AI Processing'.",
+      "empty_states": "Always action-oriented: tell the user exactly what to do next.",
+      "errors": "Always specific: 'PDF too large (12MB). Max file size is 10MB.' not 'Upload failed.'",
+      "loading": "Always informative: 'Analyzing 23 resumes...' not 'Loading...'"
+    }
+  },
+
+  "design_tokens": {
+    "colors": {
+      "_comment": "The palette is cool-dark. Background is near-black navy, not pure black. Cards are slate with enough lightness to feel elevated. Only one warm accent (amber for warnings) — everything else is cool.",
+      "background": {
+        "base": "#020617",
+        "note": "Root page background — deepest layer"
+      },
+      "surface": {
+        "default": "#0F172A",
+        "note": "Sidebar, secondary panels — one step above base"
+      },
+      "card": {
+        "default": "#1E293B",
+        "hover": "#243347",
+        "active": "#1A2E44",
+        "note": "Primary card background"
+      },
+      "overlay": {
+        "modal": "rgba(2, 6, 23, 0.85)",
+        "dropdown": "#1E293B",
+        "tooltip": "#0F172A",
+        "note": "Layered above content"
+      },
+      "interactive": {
+        "primary": "#2563EB",
+        "primary_hover": "#1D4ED8",
+        "primary_active": "#1E40AF",
+        "primary_subtle": "rgba(37, 99, 235, 0.12)",
+        "primary_glow": "rgba(37, 99, 235, 0.2)",
+        "secondary": "#7C3AED",
+        "secondary_subtle": "rgba(124, 58, 237, 0.12)",
+        "ghost_hover": "rgba(248, 250, 252, 0.06)",
+        "ghost_active": "rgba(248, 250, 252, 0.10)"
+      },
+      "semantic": {
+        "success": "#10B981",
+        "success_subtle": "rgba(16, 185, 129, 0.12)",
+        "success_border": "rgba(16, 185, 129, 0.25)",
+        "warning": "#F59E0B",
+        "warning_subtle": "rgba(245, 158, 11, 0.12)",
+        "warning_border": "rgba(245, 158, 11, 0.25)",
+        "danger": "#EF4444",
+        "danger_subtle": "rgba(239, 68, 68, 0.12)",
+        "danger_border": "rgba(239, 68, 68, 0.25)",
+        "info": "#38BDF8",
+        "info_subtle": "rgba(56, 189, 248, 0.12)",
+        "info_border": "rgba(56, 189, 248, 0.25)"
+      },
+      "score_spectrum": {
+        "_comment": "Used only for score rendering. Color is derived from score value, not hardcoded per candidate.",
+        "90_100": { "color": "#10B981", "bg": "rgba(16,185,129,0.12)", "label": "Exceptional" },
+        "80_89":  { "color": "#2563EB", "bg": "rgba(37,99,235,0.12)",  "label": "Strong" },
+        "70_79":  { "color": "#38BDF8", "bg": "rgba(56,189,248,0.12)", "label": "Good" },
+        "60_69":  { "color": "#F59E0B", "bg": "rgba(245,158,11,0.12)", "label": "Fair" },
+        "50_59":  { "color": "#F97316", "bg": "rgba(249,115,22,0.12)", "label": "Weak" },
+        "0_49":   { "color": "#EF4444", "bg": "rgba(239,68,68,0.12)",  "label": "Poor" }
+      },
+      "text": {
+        "primary": "#F8FAFC",
+        "secondary": "#CBD5E1",
+        "muted": "#64748B",
+        "disabled": "#334155",
+        "inverse": "#020617",
+        "link": "#2563EB",
+        "link_hover": "#38BDF8"
+      },
+      "border": {
+        "subtle": "#1E293B",
+        "default": "#334155",
+        "strong": "#475569",
+        "focus": "#2563EB"
+      }
+    },
+
+    "spacing": {
+      "_system": "4px base unit. All spacing is multiples of 4.",
+      "scale": {
+        "1": "4px",   "2": "8px",   "3": "12px",  "4": "16px",
+        "5": "20px",  "6": "24px",  "7": "28px",  "8": "32px",
+        "10": "40px", "12": "48px", "14": "56px", "16": "64px",
+        "20": "80px", "24": "96px"
+      },
+      "component_padding": {
+        "card_sm":   "padding: 20px 24px",
+        "card_md":   "padding: 28px 32px",
+        "card_lg":   "padding: 36px 40px",
+        "modal":     "padding: 32px",
+        "table_row": "padding: 20px 24px (vertical 20, horizontal 24)",
+        "table_cell_gap": "16px between adjacent cells",
+        "button_sm": "padding: 6px 14px",
+        "button_md": "padding: 10px 20px",
+        "button_lg": "padding: 14px 28px",
+        "input":     "padding: 10px 14px",
+        "badge":     "padding: 3px 10px",
+        "tooltip":   "padding: 8px 12px"
+      },
+      "section_gaps": {
+        "between_page_sections": "48px",
+        "between_cards_in_grid": "24px",
+        "between_kpi_cards":     "20px",
+        "between_table_rows":    "0px (border-separated)",
+        "between_form_fields":   "20px",
+        "section_header_to_content": "20px",
+        "eyebrow_to_heading":    "6px",
+        "heading_to_subtext":    "8px"
+      },
+      "page_layout": {
+        "sidebar_width_expanded":  "256px",
+        "sidebar_width_collapsed": "72px",
+        "header_height":           "64px",
+        "content_padding":         "40px (horizontal) 36px (vertical top) 48px (vertical bottom)",
+        "max_content_width":       "1400px",
+        "grid_columns":            "12",
+        "grid_gap":                "24px"
+      }
+    },
+
+    "typography": {
+      "_system": "Inter for all UI text. JetBrains Mono for scores, IDs, code. The type scale has 8 steps — never invent new sizes.",
+      "font_imports": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap",
+        "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+      ],
+      "scale": {
+        "display":    { "size": "36px", "weight": 800, "lineHeight": "1.1",  "letterSpacing": "-0.04em", "family": "Inter",          "usage": "Marketing headlines only" },
+        "h1":         { "size": "28px", "weight": 700, "lineHeight": "1.2",  "letterSpacing": "-0.03em", "family": "Inter",          "usage": "Page titles" },
+        "h2":         { "size": "20px", "weight": 700, "lineHeight": "1.3",  "letterSpacing": "-0.02em", "family": "Inter",          "usage": "Section headings" },
+        "h3":         { "size": "16px", "weight": 600, "lineHeight": "1.4",  "letterSpacing": "-0.01em", "family": "Inter",          "usage": "Card headings, sub-sections" },
+        "h4":         { "size": "14px", "weight": 600, "lineHeight": "1.4",  "letterSpacing": "0",       "family": "Inter",          "usage": "Table column headers, labels" },
+        "body_lg":    { "size": "15px", "weight": 400, "lineHeight": "1.65", "letterSpacing": "0",       "family": "Inter",          "usage": "Primary body text, descriptions" },
+        "body_md":    { "size": "14px", "weight": 400, "lineHeight": "1.6",  "letterSpacing": "0",       "family": "Inter",          "usage": "Secondary body, table content" },
+        "body_sm":    { "size": "13px", "weight": 400, "lineHeight": "1.55", "letterSpacing": "0",       "family": "Inter",          "usage": "Captions, metadata, helper text" },
+        "label":      { "size": "11px", "weight": 600, "lineHeight": "1.4",  "letterSpacing": "0.06em",  "family": "Inter",          "usage": "Eyebrow labels, column headers — UPPERCASE only" },
+        "score_xl":   { "size": "48px", "weight": 800, "lineHeight": "1",    "letterSpacing": "-0.04em", "family": "JetBrains Mono", "usage": "Main score in ScoreRing center" },
+        "score_lg":   { "size": "32px", "weight": 700, "lineHeight": "1",    "letterSpacing": "-0.03em", "family": "JetBrains Mono", "usage": "KPI card values" },
+        "score_md":   { "size": "20px", "weight": 600, "lineHeight": "1",    "letterSpacing": "-0.02em", "family": "JetBrains Mono", "usage": "Score badges in table" },
+        "mono_sm":    { "size": "12px", "weight": 400, "lineHeight": "1.5",  "letterSpacing": "0",       "family": "JetBrains Mono", "usage": "IDs, timestamps, version numbers" }
+      }
+    },
+
+    "elevation": {
+      "_system": "Cards are elevated via border + subtle box-shadow. Never use backdrop-filter on primary cards — only on modals and dropdowns.",
+      "level_0": "No shadow. Used for table rows, list items embedded in cards.",
+      "level_1": "box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 0 0 1px rgba(51,65,85,0.6). Default card.",
+      "level_2": "box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(51,65,85,0.6). Hovered card.",
+      "level_3": "box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(37,99,235,0.4). Active/selected card.",
+      "level_4": "box-shadow: 0 20px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(51,65,85,0.5). Modal / dropdown.",
+      "glow_primary":   "box-shadow: 0 0 24px rgba(37,99,235,0.25), 0 0 0 1px rgba(37,99,235,0.4)",
+      "glow_success":   "box-shadow: 0 0 24px rgba(16,185,129,0.2),  0 0 0 1px rgba(16,185,129,0.35)",
+      "glow_warning":   "box-shadow: 0 0 24px rgba(245,158,11,0.2),  0 0 0 1px rgba(245,158,11,0.35)"
+    },
+
+    "border_radius": {
+      "xs": "4px",
+      "sm": "6px",
+      "md": "8px",
+      "lg": "12px",
+      "xl": "16px",
+      "2xl": "20px",
+      "full": "9999px",
+      "usage": {
+        "card":    "12px",
+        "button":  "8px",
+        "input":   "8px",
+        "badge":   "9999px",
+        "avatar":  "9999px",
+        "modal":   "16px",
+        "tooltip": "6px",
+        "chip":    "9999px",
+        "progress_bar": "9999px",
+        "table":   "12px (outer container only)"
+      }
+    },
+
+    "motion": {
+      "_principle": "Motion must have purpose. Animate to guide attention, confirm action, or smooth a transition. Never animate to decorate.",
+      "duration": {
+        "instant":   "0ms   — state toggling (checkbox, radio)",
+        "fast":      "150ms — hover states, small reveals",
+        "base":      "200ms — color transitions, opacity",
+        "medium":    "300ms — card hover, dropdown open",
+        "slow":      "450ms — panel slide, modal open",
+        "entrance":  "600ms — page load, first render",
+        "data":      "800ms — score ring draw, counter increment"
+      },
+      "easing": {
+        "default":    "cubic-bezier(0.16, 1, 0.3, 1)  — snappy ease-out for most transitions",
+        "spring":     "cubic-bezier(0.34, 1.56, 0.64, 1) — slight overshoot for score ring, badges",
+        "linear":     "linear — progress bars, loading indicators",
+        "ease_in":    "cubic-bezier(0.4, 0, 1, 1) — exit transitions only"
+      },
+      "patterns": {
+        "card_entrance": "opacity: 0→1, translateY: 12px→0 over 450ms with stagger: index * 50ms",
+        "score_ring":    "SVG stroke-dashoffset animates from full-circumference to target over 900ms",
+        "counter":       "requestAnimationFrame easeOut from 0 to target over 700ms",
+        "table_row_hover": "background-color transition 150ms, border-left-color 150ms",
+        "sidebar_collapse": "width transition 250ms cubic-bezier(0.16,1,0.3,1), text opacity 150ms 0ms→100ms delay",
+        "modal_open":    "opacity 0→1, scale 0.96→1 over 300ms",
+        "toast_enter":   "translateX: 100%→0 over 300ms spring",
+        "toast_exit":    "opacity 1→0 over 200ms ease-in",
+        "pipeline_step": "checkmark scale 0→1 spring 300ms when step completes",
+        "badge_appear":  "scale 0.8→1, opacity 0→1 over 200ms spring"
+      },
+      "reduced_motion": "All animations replaced with instant transitions when prefers-reduced-motion: reduce"
+    }
+  },
+
+  "layout_system": {
+    "page_shell": {
+      "structure": "Fixed sidebar (left) + Fixed header (top, right of sidebar) + Scrollable main content",
+      "css_grid": "display:grid; grid-template-columns: {sidebarWidth} 1fr; grid-template-rows: {headerHeight} 1fr; height: 100vh; overflow: hidden;",
+      "main_scroll": "The only scrollable element is the main content area — sidebar and header never scroll"
+    },
+    "sidebar": {
+      "width_expanded":  "256px",
+      "width_collapsed": "72px",
+      "background": "surface (#0F172A)",
+      "border_right": "1px solid #1E293B",
+      "padding_top": "0",
+      "sections": {
+        "logo_area": {
+          "height": "64px (matches header)",
+          "padding": "0 20px",
+          "content": "Logo SVG (24x24) + 'TalentGraph AI' wordmark in Inter 600 — fades to just icon on collapse",
+          "border_bottom": "1px solid #1E293B"
+        },
+        "nav_section": {
+          "padding": "20px 12px",
+          "gap_between_items": "4px",
+          "section_labels": {
+            "text": "MAIN / INSIGHTS / SETTINGS (uppercase label style)",
+            "margin": "16px 8px 6px 8px",
+            "only_show_when": "Sidebar expanded"
+          },
+          "nav_items": [
+            {
+              "icon": "LayoutDashboard",
+              "label": "Dashboard",
+              "route": "/",
+              "section": "MAIN"
+            },
+            {
+              "icon": "Sparkles",
+              "label": "AI Ranking",
+              "route": "/ranking",
+              "section": "MAIN",
+              "badge": { "text": "New", "color": "primary" }
+            },
+            {
+              "icon": "Users",
+              "label": "Candidates",
+              "route": "/candidates",
+              "section": "MAIN"
+            },
+            {
+              "icon": "Briefcase",
+              "label": "Jobs",
+              "route": "/jobs",
+              "section": "MAIN"
+            },
+            {
+              "icon": "BarChart3",
+              "label": "Analytics",
+              "route": "/analytics",
+              "section": "INSIGHTS"
+            },
+            {
+              "icon": "FileText",
+              "label": "Reports",
+              "route": "/reports",
+              "section": "INSIGHTS"
+            },
+            {
+              "icon": "Settings",
+              "label": "Settings",
+              "route": "/settings",
+              "section": "SETTINGS"
+            }
+          ],
+          "nav_item_style": {
+            "height": "40px",
+            "padding": "0 12px",
+            "border_radius": "8px",
+            "gap_icon_label": "12px",
+            "icon_size": "18px",
+            "default":  "text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-all 150ms",
+            "active":   "bg-blue-500/12 text-blue-400 font-medium [box-shadow:inset_3px_0_0_#2563EB]"
+          }
+        },
+        "bottom_area": {
+          "padding": "12px",
+          "border_top": "1px solid #1E293B",
+          "content": {
+            "upgrade_banner": {
+              "show_when": "Free plan user",
+              "style": "bg-primary-subtle rounded-lg p-3 mb-3",
+              "content": "Upgrade to Pro — Unlock unlimited candidates",
+              "cta": "Upgrade"
+            },
+            "user_row": {
+              "padding": "8px",
+              "content": "Avatar (32px circle) + Name (body_sm, text-primary) + Role (body_sm, text-muted)",
+              "right": "MoreHorizontal icon → dropdown",
+              "collapse_behavior": "Shows only avatar when collapsed"
+            },
+            "collapse_toggle": {
+              "position": "absolute, right: -12px, top: 50% of nav section",
+              "style": "16px circle, bg-card, border border-default, shadow-md",
+              "icon": "ChevronLeft / ChevronRight 10px"
+            }
+          }
+        }
+      }
+    },
+    "header": {
+      "height": "64px",
+      "background": "surface (#0F172A) with border-bottom: 1px solid #1E293B",
+      "padding": "0 40px",
+      "layout": "flex justify-between items-center",
+      "left": {
+        "breadcrumb": {
+          "style": "text-muted / ChevronRight separator / text-primary (current page)",
+          "example": "Dashboard  /  AI Ranking  /  Senior Frontend Engineer",
+          "font": "body_sm"
+        }
+      },
+      "center": {
+        "search": {
+          "width": "320px — expands to 480px on focus",
+          "placeholder": "Search candidates, jobs, skills...  ⌘K",
+          "icon": "Search 16px left inside input",
+          "style": "bg-card border-default focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-lg",
+          "behavior": "Focus opens command palette overlay with recent searches + quick results"
+        }
+      },
+      "right": {
+        "items": [
+          {
+            "type": "button",
+            "label": "Upload Resumes",
+            "icon": "Upload",
+            "variant": "outline",
+            "size": "sm"
+          },
+          {
+            "type": "icon_button",
+            "icon": "Bell",
+            "badge": "3 unread",
+            "tooltip": "Notifications",
+            "dropdown": "Notification panel slides in from right"
+          },
+          {
+            "type": "divider",
+            "style": "h-6 w-px bg-border-default mx-2"
+          },
+          {
+            "type": "avatar_menu",
+            "size": "32px",
+            "fallback": "Initials",
+            "dropdown_items": ["View profile", "Team settings", "API keys", "Keyboard shortcuts ⌘?", "divider", "Log out"]
+          }
+        ],
+        "gap": "8px between items"
+      }
+    }
+  },
+
+  "screens": [
+    {
+      "id": "S1",
+      "name": "Dashboard — Home",
+      "route": "/",
+      "page_title": "Dashboard",
+      "purpose": "The recruiter's home base. Start a new ranking or pick up where you left off.",
+      "breathing_notes": "This screen should feel like arriving at a clean desk in the morning, not a cluttered command center. Hero section takes up 60% vertical height. Stats are secondary.",
+
+      "layout": {
+        "type": "Two-column on large screens, single column on mobile",
+        "left_col": "col-span-7 — primary work area (JD + upload)",
+        "right_col": "col-span-5 — at-a-glance stats"
+      },
+
+      "greeting_header": {
+        "position": "Above everything. Full width.",
+        "padding_bottom": "32px",
+        "content": {
+          "eyebrow": "Label style — 'TUESDAY, 14 JANUARY 2025'",
+          "headline": "h1 — 'Good morning, Sarah.'",
+          "subtext": "body_lg text-muted — 'You have 3 active jobs and 47 unreviewed candidates.'",
+          "gap_eyebrow_to_headline": "6px",
+          "gap_headline_to_subtext": "8px"
+        }
+      },
+
+      "left_column": {
+        "gap_between_cards": "24px",
+
+        "job_description_card": {
+          "type": "Card with card_md padding",
+          "header": {
+            "layout": "flex justify-between items-center",
+            "left": {
+              "eyebrow": "Label — 'JOB DESCRIPTION'",
+              "heading": "h3 — 'What role are you hiring for?'"
+            },
+            "right": {
+              "button": "Parse JD — outline sm — only visible after text is entered"
+            }
+          },
+          "body_padding_top": "20px",
+          "textarea": {
+            "placeholder": "Paste the full job description here — title, responsibilities, required skills, experience level...",
+            "min_height": "180px",
+            "max_height": "340px",
+            "resize": "vertical",
+            "style": "bg-transparent border border-default focus:border-primary focus:ring-2 focus:ring-primary/15 rounded-lg p-4 font-body_md text-primary placeholder:text-muted w-full",
+            "character_counter": "body_sm text-muted — '0 / 5000' — bottom right, visible on focus"
+          },
+          "parsed_skills_section": {
+            "visibility": "Only appears after JD is parsed",
+            "animate": "height 0→auto with opacity 0→1 over 300ms",
+            "separator": "1px border-subtle mt-5 mb-5",
+            "eyebrow": "Label — 'EXTRACTED REQUIREMENTS'",
+            "margin_top_eyebrow": "0",
+            "margin_bottom_chips": "12px",
+            "required_skills": {
+              "label": "Required skills",
+              "style": "bg-success-subtle text-success border border-success-border rounded-full px-3 py-1 text-body_sm font-medium"
+            },
+            "nice_to_have": {
+              "label": "Nice to have",
+              "style": "bg-info-subtle text-info border border-info-border rounded-full px-3 py-1 text-body_sm font-medium"
+            },
+            "experience": {
+              "display": "body_sm — '5+ years of experience required'"
+            }
+          }
+        },
+
+        "resume_upload_card": {
+          "type": "Card with card_md padding",
+          "header": {
+            "eyebrow": "Label — 'RESUMES'",
+            "heading": "h3 — 'Upload candidate resumes'",
+            "subtext": "body_sm text-muted — 'PDF or DOCX, up to 100 files, 10MB each'"
+          },
+          "body_padding_top": "20px",
+
+          "drop_zone": {
+            "idle": {
+              "style": "border-2 border-dashed border-slate-700 rounded-xl bg-card/40 p-10 text-center cursor-pointer hover:border-slate-500 hover:bg-card/60 transition-all 200ms",
+              "icon": "UploadCloud — 40px — text-muted",
+              "heading": "h4 text-secondary — 'Drop resumes here'",
+              "subtext": "body_sm text-muted mt-1 — 'or click to browse files'",
+              "gap_icon_to_heading": "16px",
+              "note": "The drop zone has generous internal padding — 40px. It does not look cramped."
+            },
+            "dragging": {
+              "style": "border-primary bg-primary-subtle scale-[1.01] transition-all 150ms",
+              "heading": "text-primary — 'Release to upload'"
+            },
+            "uploading": {
+              "shows": "Progress bar + '23 of 47 files uploaded...' in body_sm text-muted"
+            }
+          },
+
+          "file_list": {
+            "visibility": "Appears below drop zone after files are selected",
+            "max_height": "220px",
+            "overflow": "scroll with fade mask at bottom",
+            "separator": "1px border-subtle mt-5 mb-4",
+            "header": "flex justify-between — 'h4: {n} files selected' + 'Clear all button ghost sm'",
+            "item": {
+              "height": "48px",
+              "padding": "0 4px",
+              "layout": "flex items-center gap-3",
+              "icon": "FileText 16px text-muted",
+              "filename": "body_sm text-secondary truncate max-w-[260px]",
+              "size": "mono_sm text-muted",
+              "status": "StatusDot or spinner",
+              "remove": "X icon button ghost, 20px, appears on row hover"
+            },
+            "gap_between_items": "4px"
+          }
+        },
+
+        "generate_button": {
+          "type": "Full-width button",
+          "padding_top": "8px",
+          "style_disabled": "bg-slate-800 text-muted border border-default cursor-not-allowed",
+          "style_ready":    "bg-primary text-white font-semibold shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:bg-primary-hover hover:shadow-[0_0_28px_rgba(37,99,235,0.4)] transition-all 200ms",
+          "height": "52px",
+          "border_radius": "10px",
+          "content": {
+            "icon": "Sparkles 18px",
+            "label": "h4 — 'Generate AI Ranking'",
+            "subtext": "body_sm opacity-70 ml-auto — 'Analyzes {n} resumes against your JD'"
+          },
+          "keyboard_hint": "⌘ Return — shown on right edge in mono_sm text-muted"
+        }
+      },
+
+      "right_column": {
+        "gap_between_cards": "20px",
+        "sticky_top": "24px",
+
+        "stats_grid": {
+          "type": "2x2 grid of KPI cards",
+          "gap": "16px",
+          "cards": [
+            {
+              "label": "Candidates processed",
+              "value": "2,847",
+              "trend": "+124 this week",
+              "trend_dir": "up",
+              "icon": "Users2",
+              "icon_color": "text-primary",
+              "icon_bg": "bg-primary-subtle"
+            },
+            {
+              "label": "Avg. AI score",
+              "value": "73.4",
+              "trend": "↑ 5.2 pts",
+              "trend_dir": "up",
+              "icon": "TrendingUp",
+              "icon_color": "text-success",
+              "icon_bg": "bg-success-subtle"
+            },
+            {
+              "label": "Active jobs",
+              "value": "12",
+              "trend": "3 closing soon",
+              "trend_dir": "neutral",
+              "icon": "Briefcase",
+              "icon_color": "text-info",
+              "icon_bg": "bg-info-subtle"
+            },
+            {
+              "label": "Hours saved",
+              "value": "142h",
+              "trend": "vs manual screening",
+              "trend_dir": "up",
+              "icon": "Clock",
+              "icon_color": "text-secondary",
+              "icon_bg": "bg-secondary-subtle"
+            }
+          ],
+          "kpi_card_structure": {
+            "padding": "20px",
+            "icon_area": "32x32 rounded-lg bg-{color}-subtle flex items-center justify-center",
+            "gap_icon_to_content": "16px",
+            "layout": "flex items-start gap-4",
+            "value_style": "score_lg text-primary mt-2",
+            "label_style": "label text-muted",
+            "trend_style": "body_sm mt-1 — green if up, muted if neutral, red if down"
+          }
+        },
+
+        "recent_jobs_card": {
+          "padding": "card_md",
+          "header": {
+            "layout": "flex justify-between items-center mb-5",
+            "heading": "h3 — 'Recent jobs'",
+            "link": "body_sm text-link — 'View all →'"
+          },
+          "item": {
+            "padding": "14px 0",
+            "border_bottom": "1px solid border-subtle — except last item",
+            "layout": "flex items-center justify-between",
+            "left": {
+              "job_title": "body_md font-medium text-primary",
+              "meta": "body_sm text-muted mt-1 — '{n} candidates · {date}'"
+            },
+            "right": {
+              "avg_score": "ScoreBadge component",
+              "status": "StatusDot + body_sm"
+            }
+          },
+          "items": [
+            { "title": "Senior Frontend Engineer", "candidates": 34, "date": "Today", "avg_score": 71, "status": "active" },
+            { "title": "ML Engineer — NLP",         "candidates": 28, "date": "Yesterday", "avg_score": 68, "status": "active" },
+            { "title": "Product Designer",          "candidates": 19, "date": "3 days ago", "avg_score": 79, "status": "review" },
+            { "title": "DevOps Engineer",           "candidates": 42, "date": "5 days ago", "avg_score": 65, "status": "closed" }
+          ],
+          "empty_state": {
+            "icon": "Briefcase 32px text-muted",
+            "heading": "h4 text-muted — 'No jobs yet'",
+            "subtext": "body_sm text-muted — 'Paste a job description on the left to start your first ranking.'",
+            "padding": "40px 0",
+            "text_align": "center"
+          }
+        }
+      }
+    },
+
+    {
+      "id": "S2",
+      "name": "AI Processing",
+      "route": "/ranking/process",
+      "purpose": "Full-screen pipeline view. The recruiter watches their resumes get analyzed in real time.",
+      "breathing_notes": "This screen is centered, quiet, and focused. Nothing distracts. The pipeline steps are the entire UI.",
+
+      "layout": {
+        "type": "Centered single column",
+        "max_width": "520px",
+        "padding": "80px 0",
+        "align": "center"
+      },
+
+      "components": {
+        "top_section": {
+          "eyebrow": "Label — 'AI ANALYSIS IN PROGRESS'",
+          "headline": "h1 — 'Ranking your candidates'",
+          "subtext": "body_lg text-muted mt-2 — 'Evaluating {n} resumes against Senior Frontend Engineer...'",
+          "margin_bottom": "48px"
+        },
+
+        "progress_ring": {
+          "size": "96px diameter SVG",
+          "stroke_width": "4px",
+          "track_color": "#1E293B",
+          "fill_color": "#2563EB",
+          "glow": "filter: drop-shadow(0 0 8px rgba(37,99,235,0.5))",
+          "center_text": "score_xl — animated counter 0→100%",
+          "margin_bottom": "48px"
+        },
+
+        "pipeline_steps": {
+          "container": "w-full space-y-0",
+          "connector_line": "2px solid — dashed if pending, solid if complete, blue if active",
+          "step": {
+            "padding": "16px 0",
+            "layout": "flex items-start gap-4",
+            "indicator": {
+              "size": "36px",
+              "border_radius": "50%",
+              "pending":  "bg-card border-2 border-default — icon inside: step number in mono_sm text-muted",
+              "active":   "bg-primary-subtle border-2 border-primary — spinner inside (blue 16px)",
+              "complete": "bg-success-subtle border-2 border-success — check icon inside (green 16px)"
+            },
+            "content": {
+              "label_pending":  "body_md text-muted",
+              "label_active":   "body_md font-semibold text-primary",
+              "label_complete": "body_md text-secondary line-through opacity-60",
+              "sublabel_active": "body_sm text-muted mt-1 — real-time detail e.g. 'Found 14 required skills, 3 optional'"
+            }
+          },
+          "steps": [
+            { "id": 1, "label": "Reading job description",      "sublabel": "Extracting requirements and scoring criteria" },
+            { "id": 2, "label": "Extracting required skills",   "sublabel": "Found 14 required skills, 3 optional" },
+            { "id": 3, "label": "Parsing resumes",              "sublabel": "Processed 23 of 47 resumes..." },
+            { "id": 4, "label": "Semantic skill matching",      "sublabel": "Comparing candidate skills to job requirements" },
+            { "id": 5, "label": "Analyzing career trajectory",  "sublabel": "Scoring growth, promotions, and tenure patterns" },
+            { "id": 6, "label": "Predicting hiring readiness",  "sublabel": "Checking for availability and interview signals" },
+            { "id": 7, "label": "Verifying profile integrity",  "sublabel": "Detecting inconsistencies and red flags" },
+            { "id": 8, "label": "Building explainability",      "sublabel": "Generating human-readable score breakdowns" },
+            { "id": 9, "label": "Finalizing rankings",          "sublabel": "Sorting and preparing your shortlist" }
+          ]
+        },
+
+        "footer": {
+          "margin_top": "40px",
+          "live_count": "body_sm text-muted text-center — 'Processed 23 of 47 resumes'",
+          "cancel_link": "body_sm text-muted underline hover:text-secondary cursor-pointer mt-3 text-center — 'Cancel and go back'"
+        }
+      }
+    },
+
+    {
+      "id": "S3",
+      "name": "Candidate Ranking Dashboard",
+      "route": "/ranking/[jobId]/results",
+      "purpose": "The main output. A ranked table of all candidates with scores, filters, and quick actions.",
+      "breathing_notes": "Table rows need room to breathe. 20px vertical padding per row minimum. The table should feel like a premium data tool, not a spreadsheet.",
+
+      "page_header": {
+        "padding_bottom": "32px",
+        "layout": "flex justify-between items-start",
+        "left": {
+          "eyebrow": "Label — 'AI RANKING RESULTS'",
+          "heading": "h1 — 'Senior Frontend Engineer'",
+          "meta": "body_md text-muted mt-1 — 'Acme Corp · 47 candidates analyzed · Ranked 4 minutes ago'"
+        },
+        "right": {
+          "button_group": {
+            "gap": "8px",
+            "buttons": [
+              { "label": "Re-run", "icon": "RefreshCw", "variant": "outline", "size": "sm" },
+              { "label": "Export", "icon": "Download", "variant": "outline", "size": "sm", "has_dropdown": true },
+              { "label": "Share", "icon": "Share2", "variant": "primary", "size": "sm" }
+            ]
+          }
+        }
+      },
+
+      "kpi_strip": {
+        "layout": "5-column flex row",
+        "gap": "16px",
+        "margin_bottom": "32px",
+        "cards": [
+          { "label": "Total ranked", "value": "47",    "icon": "Users2",        "color": "primary" },
+          { "label": "Avg. AI score","value": "68.3",  "icon": "TrendingUp",    "color": "success" },
+          { "label": "Top picks",    "value": "8",     "icon": "Star",          "color": "warning", "tooltip": "Candidates scoring 80+" },
+          { "label": "Ready now",    "value": "12",    "icon": "CalendarCheck", "color": "info",    "tooltip": "Available to interview within 2 weeks" },
+          { "label": "Skill match",  "value": "74%",   "icon": "CheckCircle2",  "color": "success", "tooltip": "Average required skill coverage" }
+        ],
+        "card_style": {
+          "padding": "16px 20px",
+          "layout": "flex items-center gap-3",
+          "icon_container": "28x28 rounded-lg bg-{color}-subtle flex-shrink-0",
+          "label": "label text-muted",
+          "value": "score_md font-bold text-primary mt-0.5"
+        }
+      },
+
+      "controls_row": {
+        "layout": "flex items-center justify-between gap-4",
+        "margin_bottom": "20px",
+        "left": {
+          "search": {
+            "width": "280px",
+            "placeholder": "Search by name, skill, or location...",
+            "icon": "Search 14px",
+            "clears_on": "Escape key or X button"
+          },
+          "active_filters": {
+            "display": "FilterChips appear here when filters are applied",
+            "clear_all": "Ghost button — 'Clear all' — appears only when filters are active"
+          }
+        },
+        "right": {
+          "filter_button": {
+            "label": "Filters",
+            "icon": "SlidersHorizontal",
+            "badge": "{n} active filters badge when filters applied",
+            "variant": "outline",
+            "opens": "Filter panel slides in from right (drawer)"
+          },
+          "sort_select": {
+            "label": "Sort by: Overall Score",
+            "options": ["Overall Score", "Semantic Match", "Career Growth", "Experience (High)", "Experience (Low)", "Availability", "Profile Integrity"]
+          },
+          "view_toggle": {
+            "options": ["Table", "Cards"],
+            "style": "Segmented control, 2 options"
+          }
+        }
+      },
+
+      "candidate_table": {
+        "container": "rounded-xl border border-default overflow-hidden",
+        "thead": {
+          "background": "bg-surface",
+          "border_bottom": "1px solid border-default",
+          "padding": "14px 24px",
+          "columns": [
+            { "key": "select",      "width": "44px",   "type": "checkbox" },
+            { "key": "rank",        "width": "52px",   "label": "#",       "align": "center" },
+            { "key": "candidate",   "width": "auto",   "label": "Candidate" },
+            { "key": "score",       "width": "100px",  "label": "AI Score",  "sortable": true },
+            { "key": "match",       "width": "120px",  "label": "Skill Match","sortable": true },
+            { "key": "experience",  "width": "100px",  "label": "Experience", "sortable": true },
+            { "key": "location",    "width": "140px",  "label": "Location" },
+            { "key": "available",   "width": "120px",  "label": "Availability" },
+            { "key": "recommend",   "width": "160px",  "label": "Recommendation" },
+            { "key": "actions",     "width": "80px",   "label": "",          "align": "right" }
+          ],
+          "column_header_style": "label text-muted"
+        },
+        "tbody": {
+          "row_height": "72px",
+          "row_padding": "0 24px",
+          "row_hover": "bg-card/60 cursor-pointer",
+          "row_selected": "bg-primary-subtle",
+          "border_bottom": "1px solid border-subtle",
+          "cells": {
+            "rank": {
+              "content": "mono_sm font-bold text-muted — '#1', '#2'...",
+              "top3_style": "Text-primary with subtle gold/silver/bronze tint"
+            },
+            "candidate": {
+              "layout": "flex items-center gap-3",
+              "avatar": "36x36 rounded-full bg-gradient-to-br from-primary to-secondary — initials in body_sm text-white font-semibold",
+              "name": "body_md font-semibold text-primary",
+              "headline": "body_sm text-muted — current title",
+              "spacing": "Name and headline in a flex-col gap-0.5"
+            },
+            "score": {
+              "component": "ScoreBadge — pill with score number and color by range",
+              "style": "score_md font-bold in rounded-full px-3 py-1"
+            },
+            "match": {
+              "layout": "flex items-center gap-2",
+              "bar": "w-20 h-1.5 rounded-full bg-border-default overflow-hidden — inner bar fills to match %",
+              "value": "body_sm text-muted — '87%'"
+            },
+            "experience": {
+              "content": "body_sm text-secondary — '6 years'"
+            },
+            "location": {
+              "layout": "flex items-center gap-1.5",
+              "icon": "MapPin 12px text-muted",
+              "text": "body_sm text-secondary"
+            },
+            "available": {
+              "component": "AvailabilityBadge — small pill",
+              "variants": {
+                "immediate":   "bg-success-subtle text-success border-success-border — 'Available now'",
+                "within_30d":  "bg-info-subtle text-info border-info-border — 'In 30 days'",
+                "within_90d":  "bg-warning-subtle text-warning border-warning-border — 'In 3 months'",
+                "unavailable": "bg-card text-muted border-default — 'Not available'"
+              }
+            },
+            "recommend": {
+              "component": "RecommendationBadge",
+              "variants": {
+                "highly_recommended": "⚡ Strong yes — emerald",
+                "recommended":        "✓ Recommend — blue",
+                "consider":           "~ Worth a look — amber",
+                "not_recommended":    "✗ Not a fit — red/muted"
+              }
+            },
+            "actions": {
+              "layout": "flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity",
+              "primary": "Eye icon button — 'View profile'",
+              "more": "MoreHorizontal icon button → dropdown: [Compare, Shortlist, Download PDF, divider, Remove]"
+            }
+          }
+        },
+
+        "bulk_action_bar": {
+          "trigger": "Appears as fixed bottom bar when 1+ rows selected",
+          "style": "fixed bottom-6 left-1/2 -translate-x-1/2 bg-card border border-default rounded-xl px-5 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex items-center gap-4",
+          "content": "body_sm font-medium — '{n} candidates selected' + divider + [Shortlist, Compare (max 3), Export, divider, Deselect all]"
+        },
+
+        "pagination": {
+          "position": "border-top inside table container, padding 16px 24px",
+          "layout": "flex justify-between items-center",
+          "left": "body_sm text-muted — 'Showing 1–25 of 47 candidates'",
+          "right": "Prev / 1 2 3 / Next — numbered pagination with page size selector"
+        }
+      },
+
+      "filter_drawer": {
+        "width": "340px",
+        "position": "fixed right-0 top-0 h-full z-50 bg-surface border-l border-default shadow-level_4",
+        "header": "flex justify-between items-center px-6 py-5 border-b border-default",
+        "sections": [
+          {
+            "label": "AI SCORE",
+            "type": "Dual range slider — 0 to 100",
+            "default": "0 – 100"
+          },
+          {
+            "label": "RECOMMENDATION",
+            "type": "Multi-select checkboxes",
+            "options": ["Strong yes", "Recommend", "Worth a look", "Not a fit"]
+          },
+          {
+            "label": "EXPERIENCE",
+            "type": "Dual range slider — 0 to 20+ years"
+          },
+          {
+            "label": "AVAILABILITY",
+            "type": "Multi-select checkboxes",
+            "options": ["Available now", "Within 30 days", "Within 3 months"]
+          },
+          {
+            "label": "LOCATION",
+            "type": "Tag input — type to add locations"
+          }
+        ],
+        "footer": "px-6 py-4 border-t border-default — 'Reset filters' ghost + 'Apply filters' primary"
+      }
+    },
+
+    {
+      "id": "S4",
+      "name": "Candidate Profile",
+      "route": "/candidates/[id]",
+      "purpose": "Deep-dive on a single candidate. The recruiter decides whether to shortlist based on this screen.",
+      "breathing_notes": "Two-column layout. Left is the candidate's story (resume). Right is AI's verdict. Both columns have generous padding. Sections are separated by 40px not dividers.",
+
+      "back_nav": {
+        "style": "flex items-center gap-2 text-muted hover:text-secondary body_sm cursor-pointer mb-6 w-fit",
+        "content": "ChevronLeft 14px + 'Back to Senior Frontend Engineer results'"
+      },
+
+      "layout": {
+        "type": "Two-column, left scrolls, right is sticky",
+        "gap": "40px",
+        "left_width": "55%",
+        "right_width": "45%"
+      },
+
+      "left_panel": {
+        "sections_gap": "48px",
+
+        "profile_header": {
+          "layout": "flex items-start gap-5",
+          "avatar": {
+            "size": "72px",
+            "style": "rounded-full bg-gradient-to-br from-primary to-secondary font-bold text-white text-2xl flex items-center justify-center"
+          },
+          "info": {
+            "name": "h1 — candidate full name",
+            "title": "body_lg text-secondary mt-1 — 'Senior Full-Stack Engineer at Atlassian'",
+            "meta_row": "flex items-center gap-4 mt-2 — [MapPin+location, Mail icon, Phone icon, LinkedIn icon]",
+            "meta_style": "flex items-center gap-1.5 body_sm text-muted"
+          },
+          "badges_row": {
+            "margin_top": "16px",
+            "gap": "8px",
+            "badges": ["AvailabilityBadge", "RecommendationBadge"]
+          },
+          "actions_row": {
+            "margin_top": "20px",
+            "gap": "8px",
+            "buttons": [
+              { "label": "Shortlist",           "icon": "Star",      "variant": "primary",  "size": "sm" },
+              { "label": "Compare",             "icon": "GitCompare","variant": "outline",  "size": "sm" },
+              { "label": "Download PDF",        "icon": "Download",  "variant": "ghost",    "size": "sm" },
+              { "label": "Send to hiring manager","icon": "Send",    "variant": "ghost",    "size": "sm" }
+            ]
+          }
+        },
+
+        "ai_executive_summary": {
+          "card_style": "border border-primary/25 bg-primary-subtle/50 rounded-xl p-6",
+          "header": {
+            "layout": "flex items-center justify-between mb-4",
+            "left": "flex items-center gap-2 — Sparkles 16px text-primary + h3 text-primary 'AI Executive Summary'",
+            "right": "ghost icon button — RefreshCw 14px — 'Regenerate'"
+          },
+          "content": "body_lg text-secondary leading-relaxed — AI-generated 3-4 sentence paragraph",
+          "real_example": "Priya is an exceptionally strong match for this role. Her 6 years at high-growth B2B SaaS companies map directly to your stack, and her promotion from mid-level to senior in under 3 years signals above-average career velocity. Two gaps worth exploring in interview: system design at scale and Kubernetes ops experience."
+        },
+
+        "experience_section": {
+          "heading_style": "h2 — 'Work experience'",
+          "items_gap": "0",
+          "item": {
+            "padding": "24px 0",
+            "border_bottom": "1px solid border-subtle — except last",
+            "layout": "flex gap-4",
+            "left": {
+              "logo": "40x40 rounded-lg bg-card border border-default flex items-center justify-center — company initial or logo",
+              "connector_line": "2px solid border-subtle connecting items vertically"
+            },
+            "right": {
+              "company_title": "h3 — 'Senior Software Engineer at Stripe'",
+              "duration": "body_sm text-muted — 'Jan 2022 – Present · 3 years'",
+              "location": "body_sm text-muted",
+              "achievements": "ul mt-3 space-y-2 — body_sm text-secondary with dot bullets",
+              "achievement_limit": "Show 3, expand to all on 'Show more' link"
+            }
+          }
+        },
+
+        "education_section": {
+          "heading_style": "h2 — 'Education'",
+          "items_gap": "16px",
+          "item": {
+            "padding": "20px",
+            "card": true,
+            "layout": "flex items-start gap-4",
+            "icon_container": "40x40 rounded-lg bg-card border border-default",
+            "institution": "h3",
+            "degree": "body_md text-secondary mt-0.5",
+            "year": "body_sm text-muted mt-0.5"
+          }
+        },
+
+        "certifications_section": {
+          "heading_style": "h2 — 'Certifications'",
+          "layout": "grid grid-cols-2 gap-3",
+          "item": {
+            "padding": "16px",
+            "card": true,
+            "icon": "Award 16px text-warning",
+            "name": "body_sm font-semibold text-primary mt-2",
+            "issuer": "body_sm text-muted",
+            "year": "mono_sm text-muted"
+          }
+        }
+      },
+
+      "right_panel": {
+        "position": "sticky top-24",
+        "sections_gap": "24px",
+
+        "score_ring_card": {
+          "padding": "card_md",
+          "center_content": {
+            "ring": {
+              "description": "SVG-based multi-arc ring, 200px diameter",
+              "outer_ring": "Overall score arc — 16px stroke, color by score range, animated draw",
+              "inner_arcs": "6 thin arcs (4px stroke) arranged concentrically inside outer ring — each arc = one dimension",
+              "center": "score_xl text-primary — animated counter + body_sm text-muted 'Overall Score'"
+            }
+          },
+          "grade_badge": {
+            "position": "Below ring, centered",
+            "style": "Pill badge large — e.g. 'A — Strong Match' in emerald",
+            "margin_top": "16px"
+          },
+          "dimension_list": {
+            "margin_top": "24px",
+            "gap": "12px",
+            "item": {
+              "layout": "flex items-center justify-between",
+              "left": "flex items-center gap-2 — [color dot 8px] + [Icon 14px text-muted] + body_sm text-secondary",
+              "right": "flex items-center gap-3 — [mini progress bar w-20 h-1] + score_md font-bold text-{color}"
+            },
+            "dimensions": [
+              { "label": "Semantic match",   "icon": "GitCompare",  "weight": "30%" },
+              { "label": "Career growth",    "icon": "TrendingUp",  "weight": "20%" },
+              { "label": "Hiring readiness", "icon": "Target",      "weight": "20%" },
+              { "label": "Profile integrity","icon": "ShieldCheck", "weight": "10%" },
+              { "label": "Leadership signal","icon": "Crown",       "weight": "10%" },
+              { "label": "Skill coverage",   "icon": "CheckSquare", "weight": "10%" }
+            ]
+          }
+        },
+
+        "radar_card": {
+          "padding": "card_md",
+          "header": "h3 — 'Capability radar'",
+          "chart": {
+            "library": "Recharts RadarChart",
+            "height": "260px",
+            "padding_top": "16px",
+            "axes": ["Skills", "Experience", "Growth", "Leadership", "Projects", "Culture"],
+            "candidate_fill":    "rgba(37,99,235,0.15)",
+            "candidate_stroke":  "#2563EB",
+            "benchmark_fill":    "rgba(100,116,139,0.08)",
+            "benchmark_stroke":  "#475569",
+            "benchmark_label":   "Role average",
+            "legend": "flex items-center gap-4 mt-3 — colored dot + body_sm text-muted"
+          }
+        },
+
+        "skill_heatmap_card": {
+          "padding": "card_md",
+          "header": {
+            "layout": "flex justify-between items-center mb-4",
+            "heading": "h3 — 'Skill coverage'",
+            "legend": "flex gap-3 — [dot + 'Matched'] [dot + 'Partial'] [dot + 'Missing'] in body_sm text-muted"
+          },
+          "skills_grid": {
+            "layout": "flex flex-wrap gap-2",
+            "matched_chip": "bg-success-subtle text-success border border-success-border rounded-full px-3 py-1 body_sm font-medium",
+            "partial_chip": "bg-warning-subtle text-warning border border-warning-border rounded-full px-3 py-1 body_sm font-medium",
+            "missing_chip": "bg-danger-subtle text-danger border border-danger-border rounded-full px-3 py-1 body_sm opacity-60 line-through"
+          }
+        }
+      }
+    },
+
+    {
+      "id": "S5",
+      "name": "AI Explainability",
+      "route": "/candidates/[id]/explain",
+      "purpose": "Full AI reasoning trace. Every score has a specific, auditable justification.",
+      "breathing_notes": "This is a reading experience. Wide margins, generous line-height, nothing competing for attention.",
+
+      "layout": "max-width 780px centered with 80px vertical padding",
+
+      "back_nav": "ChevronLeft + 'Back to Priya Sharma' — body_sm text-muted",
+
+      "sections": {
+        "verdict_banner": {
+          "margin_bottom": "40px",
+          "style": "rounded-xl border border-success-border bg-success-subtle/40 p-8",
+          "content": {
+            "badge": "RecommendationBadge large — 'Strongly Recommend'",
+            "heading": "h2 mt-4 — 'We recommend moving forward with Priya.'",
+            "reasoning": "body_lg text-secondary leading-relaxed mt-2 — one-sentence AI rationale"
+          }
+        },
+
+        "confidence_bar": {
+          "margin_bottom": "40px",
+          "label": "Label — 'AI CONFIDENCE'",
+          "layout": "flex items-center gap-4 mt-3",
+          "bar": "flex-1 h-2 rounded-full bg-border-default — inner fill animated 91% width in success color",
+          "value": "score_md text-success — '91%'",
+          "note": "body_sm text-muted mt-2 — 'Based on data completeness, signal strength, and resume consistency.'"
+        },
+
+        "signals_grid": {
+          "layout": "grid grid-cols-2 gap-6 margin-bottom-40px",
+          "positive_card": {
+            "border": "border-success-border",
+            "bg": "bg-success-subtle/30",
+            "header": "flex items-center gap-2 — CheckCircle2 text-success + h3 text-success 'Positive signals'",
+            "items": "mt-4 space-y-3 — each: flex items-start gap-2 — CheckCircle2 14px text-success mt-0.5 + body_sm text-secondary"
+          },
+          "concern_card": {
+            "border": "border-warning-border",
+            "bg": "bg-warning-subtle/30",
+            "header": "flex items-center gap-2 — AlertCircle text-warning + h3 text-warning 'Areas to explore'",
+            "items": "mt-4 space-y-3 — each: flex items-start gap-2 — AlertCircle 14px text-warning mt-0.5 + body_sm text-secondary"
+          }
+        },
+
+        "missing_skills": {
+          "margin_bottom": "40px",
+          "header": "flex items-center gap-2 mb-4 — XCircle text-danger + h3 'Missing or unverified skills'",
+          "chips": "flex flex-wrap gap-2 — missing_chip style"
+        },
+
+        "reasoning_timeline": {
+          "margin_bottom": "40px",
+          "header": "h2 mb-6 — 'How we scored this candidate'",
+          "items": {
+            "gap": "0",
+            "item": {
+              "layout": "flex gap-5",
+              "left": {
+                "indicator": "36px rounded-full bg-primary-subtle border-2 border-primary flex items-center justify-center — icon 16px text-primary",
+                "connector": "2px solid border-subtle flex-grow mt-1"
+              },
+              "right": {
+                "padding": "0 0 36px 0",
+                "dimension_label": "label text-muted",
+                "heading": "h3 mt-1",
+                "reasoning": "body_md text-secondary leading-relaxed mt-2",
+                "score_chip": "ScoreBadge inline mt-2"
+              }
+            }
+          }
+        }
+      }
+    },
+
+    {
+      "id": "S6",
+      "name": "Candidate Comparison",
+      "route": "/compare",
+      "purpose": "Side-by-side comparison of 2–3 candidates. Helps the recruiter make the final call.",
+      "breathing_notes": "Wide table with pinned label column. Rows are grouped into sections with breathing room between groups.",
+
+      "header": {
+        "padding_bottom": "32px",
+        "heading": "h1 — 'Compare candidates'",
+        "subtext": "body_md text-muted mt-1 — 'Comparing 2 of 3 max candidates'"
+      },
+
+      "comparison_table": {
+        "type": "CSS Grid — 1 label col + 2–3 candidate cols",
+        "label_col_width": "200px",
+        "candidate_col_width": "minmax(240px, 1fr)",
+        "candidate_header": {
+          "height": "100px",
+          "content": "Avatar (48px) + Name (h3) + ScoreBadge + RecommendationBadge (small)",
+          "winner_style": "border-b-2 border-primary shadow-glow_primary",
+          "close_button": "X in top-right corner of each column"
+        },
+        "add_candidate_col": {
+          "style": "border-2 border-dashed border-default rounded-lg h-[100px] flex items-center justify-center cursor-pointer hover:border-primary hover:bg-primary-subtle/20 transition-all",
+          "content": "Plus 20px text-muted + body_sm text-muted 'Add candidate'"
+        },
+        "sections": [
+          {
+            "group_label": "SCORES",
+            "rows": [
+              { "label": "Overall AI score", "type": "ScoreRing mini (64px) centered" },
+              { "label": "Semantic match",   "type": "progress bar + % value" },
+              { "label": "Career growth",    "type": "ScoreBadge" },
+              { "label": "Hiring readiness", "type": "StatusBadge" },
+              { "label": "Profile integrity","type": "RiskMeter bar" }
+            ]
+          },
+          {
+            "group_label": "PROFILE",
+            "rows": [
+              { "label": "Experience",    "type": "text — highlight longer" },
+              { "label": "Current title", "type": "text" },
+              { "label": "Location",      "type": "text" },
+              { "label": "Availability",  "type": "AvailabilityBadge" }
+            ]
+          },
+          {
+            "group_label": "SKILLS",
+            "rows": [
+              { "label": "Matched skills", "type": "chip list — success style" },
+              { "label": "Missing skills", "type": "chip list — danger style" }
+            ]
+          },
+          {
+            "group_label": "VISUALIZATION",
+            "rows": [
+              { "label": "Capability radar", "type": "Overlapping RadarChart — both candidates on same chart" }
+            ]
+          },
+          {
+            "group_label": "AI VERDICT",
+            "rows": [
+              { "label": "Recommendation", "type": "RecommendationBadge large" },
+              { "label": "AI summary",     "type": "body_sm text — 2 sentence summary" }
+            ]
+          }
+        ],
+        "row_style": {
+          "padding": "20px 24px",
+          "label_style": "body_sm font-medium text-muted",
+          "border_bottom": "1px solid border-subtle",
+          "group_header_row": "bg-surface px-6 py-3 — label text-muted sticky-ish"
+        },
+        "winner_highlight": "Column with highest overall score gets left/right border in primary color and header glow"
+      },
+
+      "sticky_action_bar": {
+        "position": "sticky bottom-0 bg-surface border-t border-default py-4 px-6 flex justify-between items-center",
+        "left": "body_sm text-muted — 'Comparing: Priya Sharma vs Ravi Kumar'",
+        "right": "flex gap-3 — [Export comparison PDF — outline] [Shortlist top candidate — primary]"
+      }
+    },
+
+    {
+      "id": "S7",
+      "name": "Analytics",
+      "route": "/analytics",
+      "purpose": "Organization-level intelligence. Trends, gaps, and hiring health.",
+      "breathing_notes": "Widget grid with 24px gutters. Each widget is self-contained with its own header. No clutter.",
+
+      "page_header": {
+        "heading": "h1 — 'Analytics'",
+        "subtext": "body_md text-muted mt-1 — 'Insights across all 38 jobs · Last updated 2 minutes ago'",
+        "right": "Date range picker — 'Last 30 days ▾'"
+      },
+
+      "filter_bar": {
+        "margin": "24px 0",
+        "layout": "flex gap-3 flex-wrap",
+        "filters": ["All departments ▾", "All roles ▾", "All locations ▾", "All seniority levels ▾"]
+      },
+
+      "widget_grid": {
+        "layout": "grid grid-cols-12 gap-6",
+        "widgets": [
+          {
+            "id": "funnel",
+            "title": "Hiring funnel",
+            "subtext": "Conversion at each stage across all active jobs",
+            "grid": "col-span-12 lg:col-span-6",
+            "type": "Custom SVG funnel chart",
+            "stages": ["Resumes received · 847", "AI screened · 847", "Score 70+ · 312", "Shortlisted · 148", "Interviewed · 67", "Offers extended · 12"],
+            "color": "Gradient from primary to secondary (top to bottom)",
+            "height": "320px"
+          },
+          {
+            "id": "score_dist",
+            "title": "Score distribution",
+            "subtext": "How candidates scored across all rankings",
+            "grid": "col-span-12 lg:col-span-6",
+            "type": "Recharts BarChart histogram",
+            "x_axis": "Score range (0-10, 10-20, ..., 90-100)",
+            "y_axis": "Number of candidates",
+            "bar_colors": "Mapped by score range using score_spectrum tokens",
+            "height": "320px"
+          },
+          {
+            "id": "skill_gaps",
+            "title": "Top skill gaps",
+            "subtext": "Most frequently missing required skills across all jobs",
+            "grid": "col-span-12 lg:col-span-8",
+            "type": "Horizontal bar chart",
+            "height": "280px",
+            "bar_label": "Skill name",
+            "bar_value": "% of candidates lacking this skill",
+            "bar_color": "Gradient danger→warning based on gap severity"
+          },
+          {
+            "id": "avg_readiness",
+            "title": "Avg. hiring readiness",
+            "subtext": "This month vs last month",
+            "grid": "col-span-12 lg:col-span-4",
+            "type": "Large gauge + sparkline trend",
+            "gauge_value": "68%",
+            "trend": "+4.2% vs last month",
+            "sparkline": "14-day line chart below gauge"
+          },
+          {
+            "id": "integrity_dist",
+            "title": "Profile integrity",
+            "subtext": "Breakdown of candidate profile reliability scores",
+            "grid": "col-span-12 lg:col-span-4",
+            "type": "Recharts PieChart donut",
+            "segments": [
+              { "label": "High integrity",  "value": "62%", "color": "#10B981" },
+              { "label": "Medium",          "value": "29%", "color": "#F59E0B" },
+              { "label": "Flagged",         "value": "9%",  "color": "#EF4444" }
+            ],
+            "center_text": "Total candidates analyzed",
+            "height": "280px"
+          },
+          {
+            "id": "skill_gap_by_role",
+            "title": "Skill gap by role",
+            "subtext": "Required skill coverage compared to candidate averages",
+            "grid": "col-span-12 lg:col-span-8",
+            "type": "Grouped bar chart",
+            "x_axis": "Role",
+            "groups": ["Required", "Candidate average"],
+            "height": "280px"
+          }
+        ],
+        "widget_card_structure": {
+          "padding": "card_md",
+          "header": {
+            "layout": "flex justify-between items-start mb-1",
+            "heading": "h3",
+            "action": "ghost icon button — MoreHorizontal — 'Export, Expand'"
+          },
+          "subtext": "body_sm text-muted mb-5",
+          "chart_area": "Fills remaining height after header"
+        }
+      }
+    }
+  ],
+
+  "component_specs": {
+    "ScoreBadge": {
+      "props": "{ score: number; size?: 'sm' | 'md' | 'lg' }",
+      "colors": "Derived from score_spectrum color tokens",
+      "sm": "px-2 py-0.5 text-xs rounded-full",
+      "md": "px-3 py-1 text-sm rounded-full font-medium — default",
+      "lg": "px-4 py-1.5 text-base rounded-full font-bold"
+    },
+    "KPICard": {
+      "props": "{ label, value, icon, color, trend?, trendDir?, tooltip? }",
+      "hover": "elevation level_1 → level_2 + border-color transitions to primary/25"
+    },
+    "ProgressRing": {
+      "props": "{ value: number; size: number; strokeWidth?: number; color?: string; animated?: boolean; showLabel?: boolean }",
+      "implementation": "SVG circle — circumference = 2πr — strokeDashoffset = circumference * (1 - value/100)",
+      "animation": "CSS transition on strokeDashoffset with duration_data easing_default"
+    },
+    "RecommendationBadge": {
+      "props": "{ type: 'highly_recommended' | 'recommended' | 'consider' | 'not_recommended'; size?: 'sm' | 'md' | 'lg' }",
+      "icons": { "highly_recommended": "Zap", "recommended": "ThumbsUp", "consider": "Info", "not_recommended": "ThumbsDown" }
+    },
+    "UploadZone": {
+      "library": "react-dropzone",
+      "props": "{ onFilesAccepted, maxFiles?: number, maxSizeMB?: number, accept?: string[] }",
+      "accepted_types": "['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']"
+    },
+    "FilterDrawer": {
+      "animation": "Framer Motion — x: '100%' → x: 0 over 300ms easing_default",
+      "overlay": "bg-black/50 backdrop-blur-sm — closes drawer on click"
+    },
+    "CommandPalette": {
+      "trigger": "⌘K",
+      "style": "Fixed centered modal, max-width 540px, bg-surface border border-default rounded-2xl shadow-level_4",
+      "sections": ["Recent", "Candidates", "Jobs", "Quick actions"],
+      "library": "Build with cmdk package"
+    }
+  },
+
+  "state_management": {
+    "zustand_stores": {
+      "useJobStore": {
+        "state": "{ currentJob, jobDescription, parsedSkills, jobsList }",
+        "actions": "{ setJobDescription, parseJD, setCurrentJob, fetchJobs }"
+      },
+      "useCandidateStore": {
+        "state": "{ candidates, filters, sortBy, sortDir, selectedIds, compareList }",
+        "actions": "{ setFilter, clearFilters, toggleSelect, addToCompare, removeFromCompare }"
+      },
+      "useUIStore": {
+        "state": "{ sidebarExpanded, activeNotifications, commandPaletteOpen }",
+        "actions": "{ toggleSidebar, addNotification, dismissNotification, openCommandPalette }"
+      }
+    },
+    "react_query": {
+      "hooks": ["useJobs()", "useCandidates(jobId)", "useCandidate(id)", "useAnalytics(dateRange)", "useParsedJD(text)"],
+      "stale_time": "300000ms (5 min) for analytics, 60000ms (1 min) for candidate lists",
+      "loading_strategy": "Always show skeleton UI — never block entire page for loading"
+    }
+  },
+
+  "file_structure": {
+    "src/app": {
+      "layout.tsx":        "Root — sidebar + header shell",
+      "page.tsx":          "S1: Dashboard",
+      "ranking": {
+        "page.tsx":        "AI Ranking entry — JD + upload form",
+        "process/page.tsx":"S2: Processing pipeline animation",
+        "[jobId]": {
+          "results/page.tsx": "S3: Candidate ranking table"
+        }
+      },
+      "candidates": {
+        "[id]": {
+          "page.tsx":          "S4: Candidate profile",
+          "explain/page.tsx":  "S5: AI Explainability"
+        }
+      },
+      "compare/page.tsx":  "S6: Comparison table",
+      "analytics/page.tsx":"S7: Analytics dashboard",
+      "jobs/page.tsx":     "Jobs list",
+      "settings/page.tsx": "Settings"
+    },
+    "src/components": {
+      "layout/": ["Sidebar.tsx", "Header.tsx", "CommandPalette.tsx", "NotificationPanel.tsx"],
+      "atoms/": ["ScoreBadge.tsx", "RecommendationBadge.tsx", "ProgressRing.tsx", "AvailabilityBadge.tsx", "FilterChip.tsx", "StatusDot.tsx", "KPICard.tsx"],
+      "molecules/": ["CandidateRow.tsx", "PipelineStep.tsx", "UploadZone.tsx", "FileListItem.tsx", "FilterDrawer.tsx", "BulkActionBar.tsx"],
+      "organisms/": ["ScoreRing.tsx", "RadarChart.tsx", "CandidateTable.tsx", "ComparisonGrid.tsx", "ExperienceTimeline.tsx"],
+      "charts/": ["HiringFunnel.tsx", "ScoreDistribution.tsx", "CareerGrowthLine.tsx", "SkillGapBar.tsx", "IntegrityDonut.tsx"],
+      "empty-states/": ["NoCandidates.tsx", "NoJobs.tsx", "NoResults.tsx"]
+    },
+    "src/lib": {
+      "types.ts":     "All TypeScript interfaces",
+      "constants.ts": "Score thresholds, color map fn, dimension weights",
+      "utils.ts":     "getScoreColor(score), getGrade(score), formatDuration(), formatDate()",
+      "api.ts":       "All API call functions (typed)"
+    },
+    "src/hooks": {
+      "useUpload.ts":              "Handles file selection, validation, upload progress",
+      "useRanking.ts":             "Manages AI ranking job polling",
+      "useCompare.ts":             "Manages compare list (max 3)",
+      "useKeyboardShortcuts.ts":   "Registers global shortcuts"
+    }
+  },
+
+  "typescript_interfaces": {
+    "Candidate": "{ id: string; name: string; email?: string; phone?: string; location: string; linkedinUrl?: string; currentTitle: string; currentCompany: string; experienceYears: number; availability: 'immediate' | 'within_30d' | 'within_90d' | 'unavailable'; overallScore: number; grade: 'A+' | 'A' | 'B+' | 'B' | 'C' | 'D'; recommendation: 'highly_recommended' | 'recommended' | 'consider' | 'not_recommended'; dimensions: ScoreDimensions; skillsMatched: string[]; skillsMissing: string[]; skillsPartial: string[]; positiveSignals: Signal[]; concerns: Signal[]; aiSummary: string; confidence: number; reasoning: ReasoningStep[]; experience: ExperienceItem[]; education: EducationItem[]; certifications: Certification[]; }",
+    "ScoreDimensions": "{ semanticMatch: number; careerGrowth: number; hiringReadiness: number; profileIntegrity: number; leadershipSignal: number; skillCoverage: number; }",
+    "Signal": "{ text: string; source?: string; weight: 'high' | 'medium' | 'low'; }",
+    "ReasoningStep": "{ dimension: string; icon: string; heading: string; reasoning: string; scoreContribution: number; }",
+    "Job": "{ id: string; title: string; company?: string; description: string; requiredSkills: string[]; niceToHaveSkills: string[]; experienceMin: number; experienceMax?: number; createdAt: string; status: 'draft' | 'processing' | 'complete' | 'error'; candidateCount?: number; avgScore?: number; }",
+    "AnalyticsData": "{ hiringFunnel: FunnelStage[]; scoreDistribution: ScoreBucket[]; topSkillGaps: SkillGap[]; avgHiringReadiness: number; readinessTrend: TrendPoint[]; integrityDistribution: PieSegment[]; skillGapByRole: GroupedBar[]; }"
+  },
+
+  "mock_data": {
+    "candidates": [
+      {
+        "id": "c_001",
+        "name": "Priya Sharma",
+        "currentTitle": "Senior Full-Stack Engineer",
+        "currentCompany": "Atlassian",
+        "location": "Bangalore, India",
+        "experienceYears": 6,
+        "availability": "within_30d",
+        "overallScore": 87,
+        "grade": "A",
+        "recommendation": "highly_recommended",
+        "dimensions": { "semanticMatch": 91, "careerGrowth": 88, "hiringReadiness": 85, "profileIntegrity": 94, "leadershipSignal": 79, "skillCoverage": 83 },
+        "skillsMatched": ["React", "Node.js", "TypeScript", "PostgreSQL", "AWS", "Docker", "GraphQL"],
+        "skillsMissing": ["Kubernetes", "Go"],
+        "skillsPartial": ["System Design", "CI/CD"],
+        "confidence": 0.91,
+        "aiSummary": "Priya is an exceptionally strong match. Her 6 years across two high-growth B2B SaaS companies maps directly to your tech stack. She was promoted to Senior in under 3 years — well above average. Two gaps worth exploring in interview: Kubernetes operations and system design at scale."
+      },
+      {
+        "id": "c_002",
+        "name": "Rahul Menon",
+        "currentTitle": "Full-Stack Developer",
+        "currentCompany": "Razorpay",
+        "location": "Pune, India",
+        "experienceYears": 4,
+        "availability": "immediate",
+        "overallScore": 74,
+        "grade": "B+",
+        "recommendation": "recommended",
+        "dimensions": { "semanticMatch": 78, "careerGrowth": 72, "hiringReadiness": 80, "profileIntegrity": 88, "leadershipSignal": 61, "skillCoverage": 71 },
+        "skillsMatched": ["React", "TypeScript", "Node.js", "MongoDB"],
+        "skillsMissing": ["AWS", "Docker", "Kubernetes", "PostgreSQL"],
+        "skillsPartial": ["GraphQL", "System Design"],
+        "confidence": 0.82,
+        "aiSummary": "Rahul is a solid match available immediately. His 4 years at Razorpay — a high-scale fintech — signals comfort with production systems. Key gaps are cloud infrastructure and containerization, which could be bridged with 1–2 months of onboarding."
+      },
+      {
+        "id": "c_003",
+        "name": "Ananya Krishnan",
+        "currentTitle": "Software Engineer II",
+        "currentCompany": "Swiggy",
+        "location": "Chennai, India",
+        "experienceYears": 3,
+        "availability": "within_30d",
+        "overallScore": 61,
+        "grade": "B",
+        "recommendation": "consider",
+        "dimensions": { "semanticMatch": 65, "careerGrowth": 70, "hiringReadiness": 58, "profileIntegrity": 79, "leadershipSignal": 45, "skillCoverage": 60 },
+        "skillsMatched": ["React", "JavaScript", "Node.js"],
+        "skillsMissing": ["TypeScript", "AWS", "Docker", "Kubernetes", "PostgreSQL", "GraphQL"],
+        "skillsPartial": ["System Design"],
+        "confidence": 0.74,
+        "aiSummary": "Ananya shows strong growth trajectory for her 3 years of experience, but the current skill overlap is too low for a senior role. She would be worth interviewing if you have a structured onboarding plan and can accommodate a 6–12 month ramp-up period."
+      }
+    ]
+  },
+
+  "accessibility": {
+    "wcag_target": "AA",
+    "focus": "All interactive elements have visible focus ring: outline: 2px solid #2563EB; outline-offset: 2px;",
+    "color_contrast": "All text on dark backgrounds meets 4.5:1. Score chips are tested for legibility.",
+    "reduced_motion": "@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }",
+    "aria": {
+      "score_ring": "role='img' aria-label='Overall AI score: 87 out of 100'",
+      "progress_bars": "role='progressbar' aria-valuenow={value} aria-valuemin={0} aria-valuemax={100}",
+      "table": "role='table' with proper thead, tbody, th[scope='col'], td semantics",
+      "icon_buttons": "Every icon-only button has aria-label"
+    },
+    "keyboard": {
+      "tab_order": "Logical left-to-right, top-to-bottom throughout all screens",
+      "j_k": "Navigate table rows (vim-style)",
+      "enter": "Open focused row",
+      "space": "Toggle selection of focused row",
+      "cmd_k": "Open command palette",
+      "esc": "Close modals, drawers, dropdowns, command palette"
+    }
+  },
+
+  "performance_targets": {
+    "LCP": "< 2.5s on 4G",
+    "FID": "< 100ms",
+    "CLS": "< 0.1",
+    "table_virtualization": "TanStack Virtual for tables with > 50 rows",
+    "code_splitting": "Each screen is a separate dynamic import — next/dynamic",
+    "image_optimization": "All avatar/logo images use next/image",
+    "bundle_size": "No chart library imported globally — Recharts imported per chart component only"
+  },
+
+  "implementation_order": {
+    "phase_1_foundation": [
+      "Install and configure: Next.js 15, TypeScript, Tailwind CSS v4, shadcn/ui, Framer Motion, Zustand, React Query",
+      "Set up design tokens in tailwind.config.ts (all color tokens as CSS variables)",
+      "Build layout shell: Sidebar + Header + PageWrapper",
+      "Build atom components: ScoreBadge, RecommendationBadge, ProgressRing, KPICard, StatusDot"
+    ],
+    "phase_2_core_screens": [
+      "S1: Dashboard — JD input + UploadZone + Recent jobs",
+      "S2: Processing — animated pipeline steps",
+      "S3: Ranking — CandidateTable with TanStack Table + FilterDrawer"
+    ],
+    "phase_3_deep_features": [
+      "S4: Candidate Profile — ScoreRing (custom SVG) + RadarChart + Explainability tab",
+      "S5: Explainability — verdict banner + signals + reasoning timeline",
+      "S6: Comparison — ComparisonGrid"
+    ],
+    "phase_4_intelligence": [
+      "S7: Analytics — all 6 chart widgets",
+      "CommandPalette with cmdk",
+      "Notification panel",
+      "Export: PDF via @react-pdf/renderer, CSV via papaparse"
+    ]
+  },
+
+  "quality_checklist": {
+    "breathing_space": [
+      "Every card has at least 28px internal padding",
+      "Section gaps are never less than 40px",
+      "Table rows are never less than 72px tall",
+      "No two cards touch — minimum 20px gap everywhere"
+    ],
+    "real_world_completeness": [
+      "Every list has an empty state with an action",
+      "Every form field has validation and error state",
+      "Every action has a loading state",
+      "Every destructive action has a confirmation dialog",
+      "Upload shows real progress (file count + bytes)",
+      "Search is debounced 150ms",
+      "All scores have visible explanations accessible in ≤2 clicks",
+      "Pagination works and preserves filters + sort",
+      "Sidebar collapse is smooth and remembers state in localStorage",
+      "Bulk action bar only appears when rows are selected",
+      "Score ring animates on every mount — no static circles",
+      "All toast notifications auto-dismiss after 4s with manual close option",
+      "All table columns are sortable on click",
+      "Mobile layout works at 375px with bottom navigation replacing sidebar"
+    ]
+  }
+}
