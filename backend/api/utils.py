@@ -25,6 +25,105 @@ def extract_text_from_pdf(pdf_file) -> str:
         logger.error(f"Error extracting text from PDF: {str(e)}")
         return ""
 
+_GROQ_PROMPT_TEMPLATE = """
+You are an expert recruiter and talent intelligence AI.
+Compare the candidate's resume text below against the Job Description (JD) and produce a detailed assessment in JSON format.
+
+Job Description:
+\"\"\"
+{jd_text}
+\"\"\"
+
+Candidate Resume:
+\"\"\"
+{resume_text}
+\"\"\"
+
+You MUST respond with a single valid JSON object containing exactly the following schema. Do not wrap it in markdown code blocks:
+{{
+  "name": "Full Name of Candidate (extracted from resume)",
+  "initials": "Initials (e.g. JS for John Smith)",
+  "role": "Current or most recent job title",
+  "current_company": "Current or most recent employer",
+  "years_exp": 8,
+  "notice_period": "Notice period, e.g., 'Immediate', '30 days', '60 days', '90 days'",
+  "location": "City, State/Country",
+  "final_score": 85,
+  "confidence": 90,
+  "recommendation": "Highly Recommended",
+  "score_breakdown": {{
+    "semantic_fit": 85,
+    "career_growth": 80,
+    "leadership": 70,
+    "hiring_readiness": 90,
+    "availability": 85,
+    "project_relevance": 80,
+    "profile_integrity_penalty": 0
+  }},
+  "strengths": ["list of 2-4 key highlights or strengths of the candidate"],
+  "weaknesses": ["list of 1-3 minor weaknesses or areas of concern"],
+  "missing_skills": ["list of important skills required by the JD that are not explicitly found in the resume"],
+  "skills": ["list of top 10 technical or professional skills found in the resume"],
+  "career_summary": "1-2 sentence summary of their career trajectory",
+  "executive_summary": "2-3 sentence executive recruiter summary of their suitability",
+  "reasoning": ["3 bullet points explaining why they received this rating/score"],
+  "experience": [
+    {{
+      "title": "Job Title",
+      "company": "Company Name",
+      "period": "Start - End Date, e.g., 2021 - Present",
+      "highlights": ["key project accomplishment 1", "key project accomplishment 2"]
+    }}
+  ],
+  "education": [
+    {{
+      "degree": "Degree (e.g. B.S. Computer Science)",
+      "school": "University Name",
+      "year": "Graduation Year"
+    }}
+  ],
+  "certifications": ["list of certifications, e.g., AWS, CKA, if any"]
+}}
+"""
+
+def evaluate_resume_with_groq(resume_text: str, jd_text: str, api_key: str) -> dict:
+    """
+    Calls the Groq API (llama-3.3-70b) to analyze the resume against the Job Description.
+    Groq provides ultra-fast inference. Returns a dict matching the Candidate schema.
+    """
+    try:
+        from groq import Groq
+        client = Groq(api_key=api_key)
+
+        prompt = _GROQ_PROMPT_TEMPLATE.format(
+            jd_text=jd_text,
+            resume_text=resume_text
+        )
+
+        chat_completion = client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            model="llama-3.3-70b-versatile",
+            response_format={"type": "json_object"},
+            temperature=0.3,
+            max_tokens=3000,
+        )
+
+        text = chat_completion.choices[0].message.content.strip()
+        # Strip markdown code fences if present
+        if text.startswith("```json"):
+            text = text.replace("```json", "", 1)
+        if text.endswith("```"):
+            text = text[:-3]
+        text = text.strip()
+
+        return json.loads(text)
+
+    except Exception as e:
+        logger.error(f"Groq API error: {str(e)}")
+        raise e
+
+
+
 def evaluate_resume_with_gemini(resume_text: str, jd_text: str, api_key: str) -> dict:
     """
     Calls the Gemini API to analyze the resume text against the Job Description (JD).

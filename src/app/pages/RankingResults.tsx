@@ -1,11 +1,10 @@
 import { 
   RefreshCw, Download, Share2, Users2, TrendingUp, Star, CalendarCheck, CheckCircle2, 
-  Search, SlidersHorizontal, MapPin, Eye, MoreHorizontal, Lightning, Target, Check
+  Search, MapPin, Eye, MoreHorizontal, Check, Copy
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-
 import { stateStore } from "../state";
 
 const mapAvailability = (notice: string): 'immediate' | 'within_30d' | 'within_90d' | 'unavailable' => {
@@ -27,12 +26,18 @@ const mapRecommendation = (rec: string): 'highly_recommended' | 'recommended' | 
 export function RankingResults() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<string[]>([]);
+  const [shortlisted, setShortlisted] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("Overall Score");
+  const [copied, setCopied] = useState(false);
 
   const appState = stateStore.get();
   const candidates = appState.candidates;
-  const activeJobTitle = appState.activeJobTitle || "Senior Frontend Engineer";
+  const activeJobTitle = appState.activeJobTitle || "Job Ranking";
+  const jobDescription = appState.jobDescription || "";
+
+  // Derive company name from JD or use generic
+  const companyLine = jobDescription.match(/(?:at|for|company[:\s]+)([A-Z][a-zA-Z0-9 &.]+?)(?:[\n.,]|$)/)?.[1]?.trim() || "";
 
   const toggleSelect = (id: string) => {
     setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -43,7 +48,53 @@ export function RankingResults() {
     else setSelected(visibleIds);
   };
 
-  // 1. Filter
+  const toggleShortlist = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShortlisted(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  /** Export candidates list as CSV */
+  const exportCSV = (rows: typeof candidates) => {
+    const headers = ["Rank","Name","Role","Company","Score","Skill Match","Experience","Location","Availability","Recommendation"];
+    const lines = rows.map((c, i) => [
+      i + 1, c.name, c.role || "", c.current_company || "",
+      c.final_score, `${c.score_breakdown?.semantic_fit || 0}%`,
+      `${c.years_exp} yrs`, c.location || "",
+      c.notice_period || "", c.recommendation || ""
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(","));
+    const csv = [headers.join(","), ...lines].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url;
+    a.download = `${activeJobTitle.replace(/\s+/g,"_")}_ranking.csv`;
+    a.click(); URL.revokeObjectURL(url);
+  };
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const handleCompareClick = () => {
+    navigate("/compare", { state: { ids: selected } });
+  };
+
+  const handleShortlistSelected = () => {
+    setShortlisted(prev => {
+      const next = new Set(prev);
+      selected.forEach(id => next.add(id));
+      return next;
+    });
+    setSelected([]);
+  };
+
+  // Filter + Sort
   const filteredCandidates = candidates.filter(c => {
     const q = search.toLowerCase();
     return (
@@ -54,33 +105,36 @@ export function RankingResults() {
       (c.skills || []).some(s => s.toLowerCase().includes(q))
     );
   });
-
-  // 2. Sort
   const sortedCandidates = [...filteredCandidates].sort((a, b) => {
-    if (sortBy === "Semantic Match") {
-      return (b.score_breakdown?.semantic_fit || 0) - (a.score_breakdown?.semantic_fit || 0);
-    }
-    if (sortBy === "Experience") {
-      return (b.years_exp || 0) - (a.years_exp || 0);
-    }
-    // Default: Overall Score
+    if (sortBy === "Semantic Match") return (b.score_breakdown?.semantic_fit || 0) - (a.score_breakdown?.semantic_fit || 0);
+    if (sortBy === "Experience") return (b.years_exp || 0) - (a.years_exp || 0);
     return (b.final_score || 0) - (a.final_score || 0);
   });
-
-  // Dynamic Metrics
   const totalRanked = candidates.length;
-  const avgScore = totalRanked > 0 
-    ? (candidates.reduce((sum, c) => sum + (c.final_score || 0), 0) / totalRanked).toFixed(1)
-    : "0.0";
+  const avgScore = totalRanked > 0
+    ? (candidates.reduce((s, c) => s + (c.final_score || 0), 0) / totalRanked).toFixed(1) : "0.0";
   const topPicks = candidates.filter(c => (c.final_score || 0) >= 80).length;
   const readyNow = candidates.filter(c => mapAvailability(c.notice_period) === "immediate").length;
   const avgSkillMatch = totalRanked > 0
-    ? Math.round(candidates.reduce((sum, c) => sum + (c.score_breakdown?.semantic_fit || 0), 0) / totalRanked)
-    : 0;
+    ? Math.round(candidates.reduce((s, c) => s + (c.score_breakdown?.semantic_fit || 0), 0) / totalRanked) : 0;
 
-  const handleCompareClick = () => {
-    navigate("/compare", { state: { ids: selected } });
-  };
+  if (candidates.length === 0) {
+    return (
+      <div className="max-w-[600px] mx-auto text-center py-24">
+        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+          <Search className="w-7 h-7 text-muted-foreground" />
+        </div>
+        <h2 className="text-xl font-bold text-foreground mb-2">No results yet</h2>
+        <p className="text-muted-foreground mb-6">Upload resumes and a job description to generate your first AI ranking.</p>
+        <button
+          onClick={() => navigate("/")}
+          className="h-10 px-6 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors"
+        >
+          Go to Dashboard
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-[1400px] mx-auto pb-24">
@@ -91,17 +145,28 @@ export function RankingResults() {
             AI RANKING RESULTS
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">{activeJobTitle}</h1>
-          <p className="text-[14px] text-muted-foreground">Acme Corp · {totalRanked} candidates analyzed · Ranked just now</p>
+          <p className="text-[14px] text-muted-foreground">
+            {companyLine && <>{companyLine} · </>}{totalRanked} candidates analyzed
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button onClick={() => navigate("/")} className="h-8 px-3 border border-border hover:bg-muted rounded-lg text-sm font-medium text-foreground flex items-center gap-2 transition-colors">
-            <RefreshCw className="w-4 h-4" /> Re-run
+          <button
+            onClick={() => navigate("/")}
+            className="h-8 px-3 border border-border hover:bg-muted rounded-lg text-sm font-medium text-foreground flex items-center gap-2 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" /> New ranking
           </button>
-          <button className="h-8 px-3 border border-border hover:bg-muted rounded-lg text-sm font-medium text-foreground flex items-center gap-2 transition-colors">
-            <Download className="w-4 h-4" /> Export
+          <button
+            onClick={() => exportCSV(sortedCandidates)}
+            className="h-8 px-3 border border-border hover:bg-muted rounded-lg text-sm font-medium text-foreground flex items-center gap-2 transition-colors"
+          >
+            <Download className="w-4 h-4" /> Export CSV
           </button>
-          <button className="h-8 px-3 bg-primary hover:bg-primary-hover rounded-lg text-sm font-medium text-primary-foreground flex items-center gap-2 transition-colors">
-            <Share2 className="w-4 h-4" /> Share
+          <button
+            onClick={handleShare}
+            className="h-8 px-3 bg-primary hover:bg-primary/90 rounded-lg text-sm font-medium text-primary-foreground flex items-center gap-2 transition-colors"
+          >
+            {copied ? <><Copy className="w-4 h-4" /> Copied!</> : <><Share2 className="w-4 h-4" /> Share</>}
           </button>
         </div>
       </div>
@@ -226,11 +291,22 @@ export function RankingResults() {
                 </td>
                 <td className="py-4 px-6 text-right">
                   <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="p-1.5 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted">
+                    <button
+                      title="View profile"
+                      onClick={(e) => { e.stopPropagation(); navigate(`/candidates/${c.id}`); }}
+                      className="p-1.5 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted"
+                    >
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button className="p-1.5 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted">
-                      <MoreHorizontal className="w-4 h-4" />
+                    <button
+                      title={shortlisted.has(c.id) ? "Remove shortlist" : "Shortlist"}
+                      onClick={(e) => toggleShortlist(c.id, e)}
+                      className={cn(
+                        "p-1.5 rounded-md hover:bg-muted transition-colors",
+                        shortlisted.has(c.id) ? "text-amber-500" : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <Star className={cn("w-4 h-4", shortlisted.has(c.id) && "fill-current")} />
                     </button>
                   </div>
                 </td>
@@ -246,17 +322,27 @@ export function RankingResults() {
       {/* Bulk Action Bar */}
       {selected.length > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-card border border-border rounded-xl px-5 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex flex-wrap justify-center items-center gap-4 animate-in slide-in-from-bottom-4 w-[90%] max-w-fit">
-          <span className="text-[13px] font-medium text-foreground whitespace-nowrap">{selected.length} candidates selected</span>
+          <span className="text-[13px] font-medium text-foreground whitespace-nowrap">{selected.length} selected</span>
           <div className="hidden sm:block w-px h-4 bg-border" />
-          <button className="text-[13px] font-medium text-primary hover:text-primary-hover transition-colors whitespace-nowrap">Shortlist</button>
-          <button 
-            onClick={handleCompareClick} 
+          <button
+            onClick={handleShortlistSelected}
+            className="text-[13px] font-medium text-amber-500 hover:text-amber-400 transition-colors whitespace-nowrap flex items-center gap-1"
+          >
+            <Star className="w-3.5 h-3.5" /> Shortlist
+          </button>
+          <button
+            onClick={handleCompareClick}
             disabled={selected.length > 3}
             className="text-[13px] font-medium text-foreground hover:text-muted-foreground transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Compare (max 3)
           </button>
-          <button className="text-[13px] font-medium text-foreground hover:text-muted-foreground transition-colors whitespace-nowrap">Export</button>
+          <button
+            onClick={() => exportCSV(candidates.filter(c => selected.includes(c.id)))}
+            className="text-[13px] font-medium text-foreground hover:text-muted-foreground transition-colors whitespace-nowrap flex items-center gap-1"
+          >
+            <Download className="w-3.5 h-3.5" /> Export
+          </button>
           <div className="hidden sm:block w-px h-4 bg-border" />
           <button onClick={() => setSelected([])} className="text-[13px] text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">Deselect all</button>
         </div>

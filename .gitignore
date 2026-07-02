@@ -121,3 +121,8 @@ db.sqlite3
 # Build outputs
 dist
 build
+
+# Sensitive & Ignore
+backend/data/
+gropw.txt
+indiaatlas-credentials*.env

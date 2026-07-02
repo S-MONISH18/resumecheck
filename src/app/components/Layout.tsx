@@ -1,15 +1,24 @@
-import { Outlet, NavLink } from "react-router";
+import { Outlet, NavLink, useNavigate } from "react-router";
 import { 
   LayoutDashboard, Search, Sparkles, BarChart3, FileText, Settings, 
-  ChevronLeft, Bell, Search as SearchIcon, Sun, Moon
+  ChevronLeft, Bell, Search as SearchIcon, Sun, Moon, LogOut
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useState } from "react";
 import { useTheme } from "./ThemeProvider";
+import { authStore } from "../auth";
 
 export function Layout() {
   const [collapsed, setCollapsed] = useState(false);
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
+  const user = authStore.getUser();
+  const initials = user?.initials || user?.name?.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase() || 'U';
+
+  const handleLogout = () => {
+    authStore.logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <div className="grid h-screen overflow-hidden" 
@@ -47,13 +56,18 @@ export function Layout() {
           )}
           <div className={cn("flex items-center gap-3", collapsed ? "justify-center" : "px-2")}>
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary shrink-0 flex items-center justify-center text-xs font-medium text-white">
-              SC
+              {initials}
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">Sarah Chen</p>
+                <p className="text-sm font-medium text-foreground truncate">{user?.name || 'User'}</p>
                 <p className="text-xs text-muted-foreground truncate">Free Plan</p>
               </div>
+            )}
+            {!collapsed && (
+              <button onClick={handleLogout} title="Sign out" className="text-muted-foreground hover:text-foreground transition-colors">
+                <LogOut className="w-4 h-4" />
+              </button>
             )}
           </div>
           <button 
@@ -92,7 +106,10 @@ export function Layout() {
             {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
           
-          <button className="h-8 px-4 bg-transparent border border-border hover:bg-muted rounded-lg text-sm font-medium text-foreground transition-colors">
+          <button
+            onClick={() => navigate("/ranking/process")}
+            className="h-8 px-4 bg-transparent border border-border hover:bg-muted rounded-lg text-sm font-medium text-foreground transition-colors"
+          >
             Upload Resumes
           </button>
           <button className="relative p-1.5 text-muted-foreground hover:text-foreground transition-colors">
@@ -100,8 +117,8 @@ export function Layout() {
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full border border-surface" />
           </button>
           <div className="w-px h-5 bg-border mx-1" />
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-xs font-medium text-white cursor-pointer">
-            SC
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-xs font-medium text-white cursor-pointer" title={user?.name}>
+            {initials}
           </div>
         </div>
       </header>

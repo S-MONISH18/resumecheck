@@ -3,7 +3,6 @@ import { Check, Loader2, AlertCircle } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useNavigate, useLocation } from "react-router";
 import { stateStore } from "../state";
-import { CANDIDATES } from "../data/candidates";
 
 const STEPS = [
   { id: 1, label: "Reading job description", sublabel: "Extracting requirements and scoring criteria" },
@@ -36,11 +35,11 @@ export function Processing() {
     const callRankApi = async () => {
       try {
         if (files.length === 0) {
-          // If no files, just simulate using original mock data
+          // If no files, just finish instantly with empty results
           setTimeout(() => {
-            apiResultRef.current = CANDIDATES;
+            apiResultRef.current = [];
             apiFinishedRef.current = true;
-          }, 2000);
+          }, 500);
           return;
         }
 
@@ -50,7 +49,7 @@ export function Processing() {
           formData.append("resumes", file);
         });
 
-        const response = await fetch("http://localhost:8000/api/rank", {
+        const response = await fetch("/api/rank", {
           method: "POST",
           body: formData
         });
@@ -66,13 +65,9 @@ export function Processing() {
           throw new Error(data.error || "Failed to process resumes.");
         }
       } catch (err: any) {
-        console.warn("Backend API rank call failed, falling back to mock simulator:", err.message);
-        // Fallback to mock candidates but match the counts
-        apiResultRef.current = CANDIDATES.map((c, i) => ({
-          ...c,
-          id: `c-mock-${i}`,
-          name: files[i]?.name.replace(".pdf", "").replace("_", " ").title || c.name,
-        }));
+        console.error("Backend API rank call failed:", err.message);
+        setErrorMsg(err.message || "Failed to process resumes.");
+        apiResultRef.current = [];
       } finally {
         apiFinishedRef.current = true;
       }
@@ -114,7 +109,7 @@ export function Processing() {
           clearInterval(timer);
           setTimeout(() => {
             // Save results to local storage state store
-            const finalCandidates = apiResultRef.current || CANDIDATES;
+            const finalCandidates = apiResultRef.current || [];
             stateStore.updateCandidates(finalCandidates, jdText, "Senior Frontend Engineer");
             navigate("/ranking/123/results");
           }, 500);
@@ -133,8 +128,12 @@ export function Processing() {
         <div className="text-[11px] font-semibold text-primary uppercase tracking-widest mb-3">
           AI ANALYSIS IN PROGRESS
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Ranking your candidates</h1>
-        <p className="text-[15px] text-muted-foreground">Evaluating {fileCount} resumes against job description...</p>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">Ranking your candidates</h1>
+        {errorMsg ? (
+          <p className="text-[15px] text-red-500 font-semibold">{errorMsg}</p>
+        ) : (
+          <p className="text-[15px] text-muted-foreground">Evaluating {fileCount} resumes against job description...</p>
+        )}
       </div>
 
       <div className="relative w-24 h-24 mb-12 flex items-center justify-center">
@@ -152,7 +151,7 @@ export function Processing() {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-3xl font-bold font-mono text-white">{progress}<span className="text-lg text-muted-foreground">%</span></span>
+          <span className="text-3xl font-bold font-mono text-foreground">{progress}<span className="text-lg text-muted-foreground">%</span></span>
         </div>
       </div>
 
@@ -189,7 +188,7 @@ export function Processing() {
                 <div className={cn(
                   "text-[14px] transition-colors duration-300",
                   status === 'complete' ? "text-slate-400 line-through opacity-60" :
-                  status === 'active' ? "text-white font-semibold" : "text-muted-foreground"
+                  status === 'active' ? "text-foreground font-semibold" : "text-muted-foreground"
                 )}>
                   {step.label}
                 </div>
@@ -208,7 +207,7 @@ export function Processing() {
         <div className="text-[13px] text-muted-foreground mb-3">
           Processed {Math.min(fileCount, Math.floor((progress/100)*fileCount))} of {fileCount} resumes
         </div>
-        <button onClick={() => navigate("/")} className="text-[13px] text-muted-foreground underline hover:text-white transition-colors">
+        <button onClick={() => navigate("/")} className="text-[13px] text-muted-foreground underline hover:text-foreground transition-colors">
           Cancel and go back
         </button>
       </div>

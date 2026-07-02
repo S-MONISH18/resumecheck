@@ -10,7 +10,7 @@ export function Explainability() {
   const candidate = appState.candidates.find(c => c.id === id) || appState.candidates[0];
 
   if (!candidate) {
-    return <div className="text-center py-20 text-white">Candidate not found.</div>;
+    return <div className="text-center py-20 text-foreground">Candidate not found.</div>;
   }
 
   const mapRecommendation = (rec: string): 'highly_recommended' | 'recommended' | 'consider' | 'not_recommended' => {
@@ -33,30 +33,23 @@ export function Explainability() {
   const growthScore = candidate.score_breakdown?.career_trajectory || 75;
   const readinessScore = candidate.score_breakdown?.hiring_readiness || 85;
 
-  const positivesList = candidate.positives && candidate.positives.length > 0 
-    ? candidate.positives 
-    : [
-        `Matches top skills including ${candidate.skills.slice(0, 3).join(', ')}`,
-        `Demonstrated background with ${candidate.years_exp} years of experience`,
-        `Directly relative title match as ${candidate.role}`
-      ];
+  const positivesList = candidate.strengths && candidate.strengths.length > 0 
+    ? candidate.strengths 
+    : [];
 
-  const negativesList = candidate.negatives && candidate.negatives.length > 0 
-    ? candidate.negatives 
-    : [
-        "Verify system architecture depth in technical screen",
-        "Confirm notice period alignment with project timeline"
-      ];
+  const negativesList = candidate.weaknesses && candidate.weaknesses.length > 0 
+    ? candidate.weaknesses 
+    : [];
 
   const missingSkillsList = candidate.missing_skills && candidate.missing_skills.length > 0 
     ? candidate.missing_skills 
-    : ["GraphQL (Optional)", "WebRTC (Optional)"];
+    : [];
 
   return (
     <div className="max-w-[800px] mx-auto pb-24">
       <button 
         onClick={() => navigate(`/candidates/${candidate.id}`)}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-white transition-colors mb-6 group"
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 group"
       >
         <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
         Back to {candidate.name}
@@ -74,7 +67,7 @@ export function Explainability() {
         {/* Confidence Banner */}
         <div className="bg-card rounded-xl border border-border p-6 flex items-center justify-between">
           <div>
-            <h3 className="text-base font-semibold text-white mb-1">AI Confidence Level: High</h3>
+            <h3 className="text-base font-semibold text-foreground mb-1">AI Confidence Level: High</h3>
             <p className="text-[13px] text-muted-foreground">Based on data completeness and signal strength across all dimensions</p>
           </div>
           <div className="flex items-center gap-4">
@@ -91,7 +84,7 @@ export function Explainability() {
           <span className="inline-block bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-4 py-1.5 rounded-full text-sm font-bold mb-4">
             {recLabels[recType]}
           </span>
-          <p className="text-lg text-slate-200 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-lg text-foreground leading-relaxed max-w-2xl mx-auto">
             {candidate.summary || `${candidate.name} exhibits solid technical expertise with ${candidate.years_exp} years of experience in key technologies.`}
           </p>
         </div>
@@ -101,17 +94,19 @@ export function Explainability() {
           <div className="bg-card rounded-xl border border-border p-6">
             <div className="flex items-center gap-2 mb-5">
               <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-              <h3 className="text-base font-semibold text-white">Positive Signals</h3>
+              <h3 className="text-base font-semibold text-foreground">Positive Signals</h3>
             </div>
             <ul className="space-y-4">
-              {positivesList.map((pos, idx) => (
+              {positivesList.length > 0 ? positivesList.map((pos: string, idx: number) => (
                 <li key={idx} className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-[14px] text-slate-200">{pos}</div>
+                    <div className="text-[14px] text-foreground">{pos}</div>
                   </div>
                 </li>
-              ))}
+              )) : (
+                <li className="text-[14px] text-muted-foreground">No specific positive signals found.</li>
+              )}
             </ul>
           </div>
 
@@ -119,17 +114,19 @@ export function Explainability() {
           <div className="bg-card rounded-xl border border-border p-6">
             <div className="flex items-center gap-2 mb-5">
               <AlertCircle className="w-5 h-5 text-amber-400" />
-              <h3 className="text-base font-semibold text-white">Areas to Explore</h3>
+              <h3 className="text-base font-semibold text-foreground">Areas to Explore</h3>
             </div>
             <ul className="space-y-4">
-              {negativesList.map((neg, idx) => (
+              {negativesList.length > 0 ? negativesList.map((neg: string, idx: number) => (
                 <li key={idx} className="flex items-start gap-3">
                   <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-[14px] text-slate-200">{neg}</div>
+                    <div className="text-[14px] text-foreground">{neg}</div>
                   </div>
                 </li>
-              ))}
+              )) : (
+                <li className="text-[14px] text-muted-foreground">No notable areas to explore.</li>
+              )}
             </ul>
           </div>
         </div>
@@ -138,18 +135,20 @@ export function Explainability() {
         <div className="bg-card rounded-xl border border-border p-6">
           <div className="flex items-center gap-2 mb-4">
             <XCircle className="w-5 h-5 text-red-400" />
-            <h3 className="text-base font-semibold text-white">Missing or Unverified Skills</h3>
+            <h3 className="text-base font-semibold text-foreground">Missing or Unverified Skills</h3>
           </div>
           <div className="flex flex-wrap gap-2">
-            {missingSkillsList.map((skill, idx) => (
+            {missingSkillsList.length > 0 ? missingSkillsList.map((skill: string, idx: number) => (
               <span key={idx} className="bg-red-500/10 text-red-400 border border-red-500/20 rounded-full px-3 py-1 text-[13px] font-medium opacity-80">{skill}</span>
-            ))}
+            )) : (
+              <span className="text-[13px] text-muted-foreground">No critical missing skills found.</span>
+            )}
           </div>
         </div>
 
         {/* Timeline */}
         <div className="bg-card rounded-xl border border-border p-8">
-          <h3 className="text-lg font-semibold text-white mb-6">How We Scored This Candidate</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-6">How We Scored This Candidate</h3>
           <div className="space-y-0 relative">
             <div className="absolute left-[19px] top-4 bottom-4 w-[2px] bg-border" />
             
@@ -188,12 +187,12 @@ export function Explainability() {
 function ReasoningStep({ icon: Icon, title, desc, impact, isLast }: any) {
   return (
     <div className="flex items-start gap-4 pb-8 relative">
-      <div className="w-10 h-10 rounded-full bg-[#0F172A] border-2 border-border flex items-center justify-center shrink-0 z-10">
+      <div className="w-10 h-10 rounded-full bg-muted border-2 border-border flex items-center justify-center shrink-0 z-10">
         <Icon className="w-4 h-4 text-primary" />
       </div>
       <div className="pt-1.5 flex-1">
-        <h4 className="text-[15px] font-semibold text-white">{title}</h4>
-        <p className="text-[14px] text-slate-300 mt-1">{desc}</p>
+        <h4 className="text-[15px] font-semibold text-foreground">{title}</h4>
+        <p className="text-[14px] text-muted-foreground mt-1">{desc}</p>
         <div className="text-[13px] font-mono text-emerald-400 mt-2 bg-emerald-400/10 inline-block px-2 py-0.5 rounded border border-emerald-400/20">
           {impact}
         </div>

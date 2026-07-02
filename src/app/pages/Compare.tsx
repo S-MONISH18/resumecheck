@@ -49,15 +49,15 @@ export function Compare() {
     },
     { 
       axis: "Trajectory", 
-      val1: c1?.score_breakdown?.career_trajectory || 0, 
-      val2: c2?.score_breakdown?.career_trajectory || 0,
-      val3: c3 ? (c3.score_breakdown?.career_trajectory || 0) : undefined 
+      val1: c1?.score_breakdown?.career_growth || 0, 
+      val2: c2?.score_breakdown?.career_growth || 0,
+      val3: c3 ? (c3.score_breakdown?.career_growth || 0) : undefined 
     },
     { 
       axis: "Culture Fit", 
-      val1: c1?.score_breakdown?.culture_fit || 0, 
-      val2: c2?.score_breakdown?.culture_fit || 0,
-      val3: c3 ? (c3.score_breakdown?.culture_fit || 0) : undefined 
+      val1: c1?.score_breakdown?.project_relevance || 0, 
+      val2: c2?.score_breakdown?.project_relevance || 0,
+      val3: c3 ? (c3.score_breakdown?.project_relevance || 0) : undefined 
     },
     { 
       axis: "Readiness", 
@@ -91,13 +91,13 @@ export function Compare() {
   return (
     <div className="max-w-[1200px] mx-auto pb-24">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Compare Candidates</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">Compare Candidates</h1>
         <p className="text-[14px] text-muted-foreground">Comparing {comparedCandidates.length} candidates for {activeJobTitle}</p>
       </div>
 
       <div className="bg-card rounded-xl border border-border overflow-x-auto">
         {/* Header Row */}
-        <div className="flex border-b border-border bg-[#0F172A] min-w-max">
+        <div className="flex border-b border-border bg-muted/30 min-w-max">
           <div className="w-[200px] shrink-0 p-6 flex items-end">
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Dimension</span>
           </div>
@@ -121,15 +121,15 @@ export function Compare() {
           </CompareRow>
           
           <CompareRow label="Career Growth">
-            {c1 && <ScoreBadge score={c1.score_breakdown?.career_trajectory || 0} />}
-            {c2 && <ScoreBadge score={c2.score_breakdown?.career_trajectory || 0} />}
-            {c3 ? <ScoreBadge score={c3.score_breakdown?.career_trajectory || 0} /> : <EmptyCell />}
+            {c1 && <ScoreBadge score={c1.score_breakdown?.career_growth || 0} />}
+            {c2 && <ScoreBadge score={c2.score_breakdown?.career_growth || 0} />}
+            {c3 ? <ScoreBadge score={c3.score_breakdown?.career_growth || 0} /> : <EmptyCell />}
           </CompareRow>
 
           <CompareRow label="Experience">
-            {c1 && <div className="text-[13px] text-slate-300">{c1.years_exp} years<br/><span className="text-muted-foreground">{c1.current_company || 'N/A'}</span></div>}
-            {c2 && <div className="text-[13px] text-slate-300">{c2.years_exp} years<br/><span className="text-muted-foreground">{c2.current_company || 'N/A'}</span></div>}
-            {c3 ? <div className="text-[13px] text-slate-300">{c3.years_exp} years<br/><span className="text-muted-foreground">{c3.current_company || 'N/A'}</span></div> : <EmptyCell />}
+            {c1 && <div className="text-[13px] text-foreground">{c1.years_exp} years<br/><span className="text-muted-foreground">{c1.current_company || 'N/A'}</span></div>}
+            {c2 && <div className="text-[13px] text-foreground">{c2.years_exp} years<br/><span className="text-muted-foreground">{c2.current_company || 'N/A'}</span></div>}
+            {c3 ? <div className="text-[13px] text-foreground">{c3.years_exp} years<br/><span className="text-muted-foreground">{c3.current_company || 'N/A'}</span></div> : <EmptyCell />}
           </CompareRow>
 
           <CompareRow label="Skill Match">
@@ -176,17 +176,17 @@ export function Compare() {
         <RadarChart data={radarData} size={300} />
         <div className="flex items-center gap-6 mt-6">
           {c1 && (
-            <div className="flex items-center gap-2 text-[13px] text-slate-300">
+            <div className="flex items-center gap-2 text-[13px] text-foreground">
               <div className="w-3 h-3 rounded bg-blue-500/40 border border-blue-500" /> {c1.name}
             </div>
           )}
           {c2 && (
-            <div className="flex items-center gap-2 text-[13px] text-slate-300">
+            <div className="flex items-center gap-2 text-[13px] text-foreground">
               <div className="w-3 h-3 rounded bg-purple-500/40 border border-purple-500" /> {c2.name}
             </div>
           )}
           {c3 && (
-            <div className="flex items-center gap-2 text-[13px] text-slate-300">
+            <div className="flex items-center gap-2 text-[13px] text-foreground">
               <div className="w-3 h-3 rounded bg-emerald-500/40 border border-emerald-500" /> {c3.name}
             </div>
           )}
@@ -194,11 +194,11 @@ export function Compare() {
       </div>
 
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-card border border-border rounded-xl px-5 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex flex-wrap justify-center items-center gap-4 animate-in slide-in-from-bottom-4 w-[90%] max-w-fit">
-        <button className="text-[13px] font-medium text-white hover:text-slate-200 flex items-center gap-2 transition-colors whitespace-nowrap">
+        <button className="text-[13px] font-medium text-foreground hover:text-muted-foreground flex items-center gap-2 transition-colors whitespace-nowrap">
           <Download className="w-4 h-4" /> Export PDF
         </button>
         <div className="hidden sm:block w-px h-4 bg-border" />
-        <button className="text-[13px] font-medium text-white hover:text-slate-200 flex items-center gap-2 transition-colors whitespace-nowrap">
+        <button className="text-[13px] font-medium text-foreground hover:text-muted-foreground flex items-center gap-2 transition-colors whitespace-nowrap">
           <Share2 className="w-4 h-4" /> Share Link
         </button>
         <div className="hidden sm:block w-px h-4 bg-border" />
@@ -221,7 +221,7 @@ function CandidateColumnHeader({ name, score, isWinner, rec }: any) {
       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-lg font-bold text-white mb-3">
         {name.split(' ').map((n: string) => n[0]).join('')}
       </div>
-      <h3 className="text-[16px] font-semibold text-white mb-1">{name}</h3>
+      <h3 className="text-[16px] font-semibold text-foreground mb-1">{name}</h3>
       <div className="flex flex-wrap items-center gap-2 mt-3">
         <ScoreBadge score={score} />
         {rec && <RecommendationBadge type={rec} />}
@@ -234,8 +234,8 @@ function CandidateColumnHeader({ name, score, isWinner, rec }: any) {
 function CompareRow({ label, children }: any) {
   return (
     <div className="flex min-h-[80px] min-w-max">
-      <div className="w-[200px] shrink-0 p-6 flex items-center border-r border-border bg-[#0F172A]/50">
-        <span className="text-[13px] font-medium text-slate-300">{label}</span>
+      <div className="w-[200px] shrink-0 p-6 flex items-center border-r border-border bg-muted/20">
+        <span className="text-[13px] font-medium text-foreground">{label}</span>
       </div>
       {Array.isArray(children) ? children.map((child, i) => (
         <div key={i} className={`flex-1 min-w-[250px] p-6 flex items-center ${i < 2 ? 'border-r border-border' : ''}`}>
@@ -252,7 +252,7 @@ function ProgressBar({ value, color }: any) {
       <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
         <div className={`h-full ${color}`} style={{ width: `${value}%` }} />
       </div>
-      <span className="text-[13px] font-mono text-white">{value}%</span>
+      <span className="text-[13px] font-mono text-foreground">{value}%</span>
     </div>
   );
 }

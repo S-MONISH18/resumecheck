@@ -52,8 +52,8 @@ export function ScoreRing({ overall, scores }: { overall: number, scores: {label
         })}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center rotate-0">
-        <div className="text-[48px] font-bold font-mono tracking-tighter leading-none text-white">{overall}</div>
-        <div className="text-[12px] text-muted-foreground uppercase tracking-wider mt-1">Overall Score</div>
+        <div className="text-[52px] font-extrabold font-mono tracking-tighter leading-none text-foreground">{overall}</div>
+        <div className="text-[13px] font-semibold text-muted-foreground uppercase tracking-widest mt-1">Overall Score</div>
       </div>
     </div>
   );

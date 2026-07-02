@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Navigate } from "react-router";
 import { Layout } from "./components/Layout";
 import { Dashboard } from "./pages/Dashboard";
 import { Processing } from "./pages/Processing";
@@ -7,11 +7,34 @@ import { CandidateProfile } from "./pages/CandidateProfile";
 import { Analytics } from "./pages/Analytics";
 import { Compare } from "./pages/Compare";
 import { Explainability } from "./pages/Explainability";
+import { Settings } from "./pages/Settings";
+import { Login } from "./pages/Login";
+import { Register } from "./pages/Register";
+import { authStore } from "./auth";
+
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  if (!authStore.isLoggedIn()) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+}
 
 export const router = createBrowserRouter([
   {
+    path: "/login",
+    Component: Login,
+  },
+  {
+    path: "/register",
+    Component: Register,
+  },
+  {
     path: "/",
-    Component: Layout,
+    Component: () => (
+      <RequireAuth>
+        <Layout />
+      </RequireAuth>
+    ),
     children: [
       { index: true, Component: Dashboard },
       { path: "ranking/process", Component: Processing },
@@ -20,7 +43,8 @@ export const router = createBrowserRouter([
       { path: "candidates/:id/explainability", Component: Explainability },
       { path: "analytics", Component: Analytics },
       { path: "compare", Component: Compare },
-      { path: "*", Component: () => <div>Not Found</div> }
+      { path: "settings", Component: Settings },
+      { path: "*", Component: () => <div className="text-foreground p-8 text-center">Page not found.</div> }
     ]
   }
 ]);

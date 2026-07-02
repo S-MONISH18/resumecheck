@@ -1,4 +1,4 @@
-import { Candidate, CANDIDATES } from "./data/candidates";
+import type { Candidate } from "./data/candidates";
 
 export interface AppState {
   candidates: Candidate[];
@@ -6,12 +6,13 @@ export interface AppState {
   activeJobTitle: string;
 }
 
-const STORAGE_KEY = "talentgraph_state";
+
+const STORAGE_KEY = "talentgraph_state_v2";
 
 const DEFAULT_STATE: AppState = {
-  candidates: CANDIDATES, // Fallback to original mock data if empty
-  jobDescription: "We are looking for a Senior Frontend Engineer with 5+ years of experience in React, TypeScript, and Tailwind CSS...",
-  activeJobTitle: "Senior Frontend Engineer"
+  candidates: [],   // No demo data — populated by real Groq AI ranking
+  jobDescription: "",
+  activeJobTitle: ""
 };
 
 export const stateStore = {

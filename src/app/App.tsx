@@ -4,7 +4,7 @@ import { ThemeProvider } from "./components/ThemeProvider";
 
 export default function App() {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="talentgraph-theme">
+    <ThemeProvider defaultTheme="light" storageKey="talentgraph-theme">
       <RouterProvider router={router} />
     </ThemeProvider>
   );

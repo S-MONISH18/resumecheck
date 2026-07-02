@@ -1,8 +1,6 @@
 
   # Complete current task
 
-  This is a code bundle for Complete current task. The original project is available at https://www.figma.com/design/zH7p0Gj66m0szgxxBfgWUu/Complete-current-task.
-
   ## Running the code
 
   Run `npm i` to install the dependencies.
